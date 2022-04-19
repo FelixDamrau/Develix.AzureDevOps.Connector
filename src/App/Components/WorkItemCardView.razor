@@ -1,0 +1,16 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+@using System.Diagnostics.CodeAnalysis
+<MudGrid>
+    @foreach (var workItem in WorkItems ?? Enumerable.Empty<WorkItem>())
+    {
+        <MudItem xs="12" sm="4" lg="3">
+            <WorkItemCard WorkItem="workItem"/>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IEnumerable<WorkItem>? WorkItems { get; set; }
+}
