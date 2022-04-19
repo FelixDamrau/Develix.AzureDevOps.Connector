@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Develix.AzureDevOps.Connector.Core</AssemblyName>
+    <RootNamespace>Develix.AzureDevOps.Connector</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Develix.AzureDevOps.Connector</PackageId>
+    <PackageVersion>1.0.0-alpha001</PackageVersion>
+    <Title>Develix AzureDevOps Connector</Title>
+    <PackageDescription>Develix Azure DevOps Connector.</PackageDescription>
+    <Authors>Felix Damrau</Authors>
+    <RepositoryUrl>https://github.com/FelixDamrau/Develix.AzureDevOps.Connector</RepositoryUrl>
+    <PackageIcon>package-icon.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Develix.Essentials" Version="1.0.0" />
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.153.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="images/package-icon.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

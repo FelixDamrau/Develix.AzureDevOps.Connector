@@ -1,0 +1,29 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+@using System.Diagnostics.CodeAnalysis
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.subtitle2">@WorkItem.WorkItemType | @WorkItem.Title</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm=4>
+                <MudText Typo="Typo.body2">ID: @WorkItem.Id</MudText>
+            </MudItem>
+            <MudItem xs="12" sm=4>
+                <MudText Typo="Typo.body2">Status: @WorkItem.Status</MudText>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" Style="min-width: 0px" Href="@WorkItem.AzureDevopsLink">Azdo</MudButton>
+        @foreach (var pr in WorkItem.PullRequests)
+        {
+            <MudButton Variant="Variant.Text" Color="Color.Primary" Style="min-width: 0px" Href="@WorkItem.AzureDevopsLink">PR @pr.Id</MudButton>
+        }
+    </MudCardActions>
+</MudCard>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    [NotNull]
+    public WorkItem? WorkItem { get; set; }
+}
