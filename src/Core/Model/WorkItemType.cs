@@ -4,7 +4,7 @@ namespace Develix.AzureDevOps.Connector.Model;
 
 public enum WorkItemType
 {
-    [Display("Invalid", "???", KnownColor.Magenta)]
+    [Display("Invalid", "Err", KnownColor.Magenta)]
     Invalid = 0,
 
     [Display("Bug", "Bug", KnownColor.Red)]
@@ -19,7 +19,7 @@ public enum WorkItemType
     [Display("Impediment", "Imp", KnownColor.DarkMagenta)]
     Impediment,
 
-    [Display("Prodcut Backlog Item", "PBI", KnownColor.Cyan)]
+    [Display("Product Backlog Item", "PBI", KnownColor.Cyan)]
     ProductBacklogItem,
 
     [Display("Task", "Tas", KnownColor.Yellow)]

@@ -12,7 +12,7 @@
     <PackageId>Develix.AzureDevOps.Connector</PackageId>
     <PackageVersion>1.0.0-alpha001</PackageVersion>
     <Title>Develix AzureDevOps Connector</Title>
-    <PackageDescription>Develix Azure DevOps Connector.</PackageDescription>
+    <PackageDescription>Develix Azure DevOps Connector</PackageDescription>
     <Authors>Felix Damrau</Authors>
     <RepositoryUrl>https://github.com/FelixDamrau/Develix.AzureDevOps.Connector</RepositoryUrl>
     <PackageIcon>package-icon.png</PackageIcon>
