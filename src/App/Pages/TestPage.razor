@@ -1,0 +1,6 @@
+﻿@page "/testpage"
+@using Develix.AzureDevOps.Connector.Service
+
+<AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginPullRequestServiceAction(u,t)" />
+
+    <AzureDevOpsServiceStatus />

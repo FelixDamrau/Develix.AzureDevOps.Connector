@@ -3,7 +3,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
 
-namespace Develix.AzureDevOps.Connector.Reader;
+namespace Develix.AzureDevOps.Connector.Service;
 
 public class QueryClient
 {
@@ -58,7 +58,8 @@ public class QueryClient
         var prRelations = azureDevopsWorkItem.Relations?.Where(r => PullRequestFactory.IsPullRequestRelation(r)).ToList();
         if (prRelations is not null && prRelations.Count > 0)
         {
-            var prClient = new PullRequestClient(azureDevopsOrgUri, azureDevopsPullRequestReadToken);
+            var prClient = new PullRequestService();
+            await prClient.Initialize(azureDevopsOrgUri, azureDevopsPullRequestReadToken);
             var prIds = prRelations.Select(prr => PullRequestFactory.GetPullRequestId(prr)).Where(r => r.Valid).Select(r => r.Value);
 
             var gitPrs = prClient.GetPullRequests(prIds);

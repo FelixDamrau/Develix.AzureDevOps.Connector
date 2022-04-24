@@ -10,6 +10,12 @@ public partial class MultiInputNumericField
     private MudNumericField<int?>? numericField;
 
     [Parameter]
+    public string ChipPrefix { get; set; } = "#";
+
+    [Parameter]
+    public string Label { get; set; } = "Number";
+
+    [Parameter]
     public HashSet<int> Values { get; set; } = new();
 
     [MemberNotNullWhen(false, nameof(intValue))]

@@ -1,6 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.App.Store;
 using Develix.AzureDevOps.Connector.Model;
-using Develix.AzureDevOps.Connector.Reader;
+using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 

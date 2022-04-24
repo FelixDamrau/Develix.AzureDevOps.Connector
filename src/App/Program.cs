@@ -1,4 +1,5 @@
-﻿using Fluxor;
+﻿using Develix.AzureDevOps.Connector.Service;
+using Fluxor;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,7 @@ builder.Services.AddMudServices();
 
 var currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options => options.ScanAssemblies(currentAssembly));
-
+builder.Services.AddSingleton<IPullRequestService>(new PullRequestService());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

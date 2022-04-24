@@ -1,0 +1,21 @@
+﻿@page "/pullrequests"
+
+<MudPaper Elevation="2" Class="pa-12">
+    <MudGrid>
+        <MudItem xs="12" sm="7" lg="9">
+            <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginPullRequestServiceAction(u,t)" />
+        </MudItem>
+        <MudItem xs="12" sm="5" lg="3">
+            <AzureDevOpsServiceStatus />
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+<MudPaper Elevation="2" Class="pa-12">
+    <MudItem xs="6">
+    <MultiInputNumericField ChipPrefix="PR" Label="Pull Request ID" Values="@ids" />
+    </MudItem>
+</MudPaper>
+
+@code {
+    private readonly HashSet<int> ids = new();
+}

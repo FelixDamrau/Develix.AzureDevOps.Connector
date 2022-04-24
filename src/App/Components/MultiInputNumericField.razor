@@ -1,21 +1,21 @@
 ﻿@using System.Diagnostics.CodeAnalysis
-<MudPaper Elevation="2" Class="pa-4">
+<MudPaper Elevation="2" Class="pa-3">
     <MudGrid>
         <MudItem xs="6" md="4" xl="3">
             <MudNumericField @ref="numericField"
                              @bind-Value="intValue"
-                             Label="WI Number"
+                             Label="@Label"
                              Variant="Variant.Text"
                              Immediate="true" />
         </MudItem>
-        <MudItem xs="1">
-            <MudIconButton Icon="@Icons.Material.Filled.Add" Disabled="Disabled()" OnClick="Add" Size="Size.Medium">Add</MudIconButton>
+        <MudItem xs="1" Style=" align-self:center; justify-content:center">
+            <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" Disabled="Disabled()" OnClick="Add" Size="Size.Medium">Add</MudIconButton>
         </MudItem>
         <MudItem xs="12" md="4">
             <MudChipSet AllClosable="true" OnClose="Closed">
                 @foreach (var value in Values)
                 {
-                    <MudChip Value="@value" Text="@string.Format("{0}{1}", "WI", @value)" Size="Size.Small" />
+                    <MudChip Value="@value" Text="@(ChipPrefix + value)" Size="Size.Small" />
                 }
             </MudChipSet>
         </MudItem>

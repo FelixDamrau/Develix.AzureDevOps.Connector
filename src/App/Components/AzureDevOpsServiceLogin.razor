@@ -1,0 +1,14 @@
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent;
+
+<MudPaper Elevation="2" Class="pa-3">
+    <MudGrid>
+        <MudItem xs="12">
+            <MudTextField T="Uri" @bind-Value="azureDevopsOrgUri" Label="Azdo URI" Required="true" InputType="InputType.Url" Converter="@converter" RequiredError="Azdo URI is required!" />
+            <MudTextField T="string" @bind-Value="token" Label="Azdo WI&Code Read Token" Required="true" InputType="InputType.Password" RequiredError="Token is required!" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton OnClick="Login" Variant="Variant.Filled" Disabled="@(!CanLogin())">Login</MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
