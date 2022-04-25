@@ -4,13 +4,13 @@ namespace Develix.AzureDevOps.Connector.App.Store.ConnectAzureDevOpsServiceUseCa
 public class Reducers
 {
     [ReducerMethod(typeof(LoginPullRequestServiceAction))]
-    public static AzureDevOpsServicesState LoginPullRequestService(AzureDevOpsServicesState state)
+    public static AzureDevOpsServicesState ReduceLoginPullRequestServiceAction(AzureDevOpsServicesState state)
     {
         return state with { PullRequestServiceConnectionStatus = Model.ConnectionStatus.Connecting };
     }
 
     [ReducerMethod]
-    public static AzureDevOpsServicesState LoginPullRequestServiceResultAction(AzureDevOpsServicesState state, LoginPullRequestServiceResultAction action)
+    public static AzureDevOpsServicesState ReduceLoginPullRequestServiceResultAction(AzureDevOpsServicesState state, LoginPullRequestServiceResultAction action)
     {
         return state with { PullRequestServiceConnectionStatus = action.ConnectionStatus };
     }
