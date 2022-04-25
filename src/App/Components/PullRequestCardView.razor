@@ -1,0 +1,17 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+@using System.Diagnostics.CodeAnalysis
+
+<MudGrid>
+    @foreach (var pullRequest in PullRequests ?? Enumerable.Empty<PullRequest>())
+    {
+        <MudItem xs="12" sm="4" lg="3">
+            <PullRequestCard PullRequest="pullRequest"/>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IEnumerable<PullRequest>? PullRequests { get; set; }
+}

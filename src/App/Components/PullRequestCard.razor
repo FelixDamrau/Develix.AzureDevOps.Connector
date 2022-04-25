@@ -1,0 +1,26 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+@using System.Diagnostics.CodeAnalysis
+
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.subtitle2">@PullRequest.Title</MudText>
+        <MudGrid>
+            <MudItem xs="12" sm=4>
+                <MudText Typo="Typo.body2">ID: @PullRequest.Id</MudText>
+            </MudItem>
+            <MudItem xs="12" sm=4>
+                <MudText Typo="Typo.body2">Status: @PullRequest.Status</MudText>
+            </MudItem>
+            <MudItem xs="12" sm=4>
+                <MudText Typo="Typo.body2">Author: @PullRequest.Author</MudText>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    [NotNull]
+    public PullRequest? PullRequest { get; set; }
+}
