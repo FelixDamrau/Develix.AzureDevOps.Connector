@@ -37,12 +37,4 @@ public partial class AzureDevOpsServiceLogin
             dispatcher.Dispatch(action);
         }
     }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        azureServicesState.StateChanged += AzureServicesState_StateChanged;
-    }
-
-    private void AzureServicesState_StateChanged(object? sender, EventArgs e) => StateHasChanged();
 }

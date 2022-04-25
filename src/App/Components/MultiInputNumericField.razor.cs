@@ -18,6 +18,9 @@ public partial class MultiInputNumericField
     [Parameter]
     public HashSet<int> Values { get; set; } = new();
 
+    [Parameter]
+    public EventCallback OnValuesChange { get; set; }
+
     [MemberNotNullWhen(false, nameof(intValue))]
     private bool Disabled() => intValue is null || Values.Contains(intValue.Value);
 
@@ -32,7 +35,12 @@ public partial class MultiInputNumericField
     private void Add(int value)
     {
         Values.Add(value);
+        OnValuesChange.InvokeAsync();
     }
 
-    private void Closed(MudChip chip) => Values.Remove((int)chip.Value);
+    private void Closed(MudChip chip)
+    {
+        Values.Remove((int)chip.Value);
+        OnValuesChange.InvokeAsync();
+    }
 }
