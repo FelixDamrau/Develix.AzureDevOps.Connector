@@ -1,6 +1,11 @@
-﻿@page "/pullrequests"
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
-<MudPaper Elevation="2" Class="pa-12">
+@page "/pullrequests"
+
+@using Develix.AzureDevOps.Connector.Service
+@using System.Diagnostics.CodeAnalysis
+
+<MudPaper Elevation="2" Class="pa-4 ma-3">
     <MudGrid>
         <MudItem xs="12" sm="7" lg="9">
             <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginPullRequestServiceAction(u,t)" />
@@ -9,13 +14,51 @@
             <AzureDevOpsServiceStatus />
         </MudItem>
     </MudGrid>
-</MudPaper>
-<MudPaper Elevation="2" Class="pa-12">
-    <MudItem xs="6">
-    <MultiInputNumericField ChipPrefix="PR" Label="Pull Request ID" Values="@ids" />
-    </MudItem>
+
+    <MudGrid>
+        <MudItem xs="6">
+            <MultiInputNumericField ChipPrefix="PR" Label="Pull Request ID" Values="@ids" OnValuesChange="@(() => StateHasChanged())" />
+        </MudItem>
+        <MudItem xs =6>
+            <MudButton OnClick="GetPullRequests" Disabled="GetPullRequestsDisabled()">
+                @if (!pageState.Value.IsLoading)
+                {
+                    <MudText>Get PRs</MudText>
+                }
+                else
+                {
+                    <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true"/>
+                    <MudText Class="pl-4">Loading</MudText>
+                }
+            </MudButton>
+        </MudItem>
+        <PullRequestCardView PullRequests="pageState.Value.PullRequests" />
+    </MudGrid>
 </MudPaper>
 
 @code {
+    [Inject]
+    [NotNull]
+    private IState<PullRequestPageState>? pageState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IState<AzureDevOpsServicesState>? servicesState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IDispatcher? dispatcher { get; set; }
+
     private readonly HashSet<int> ids = new();
+
+    private void GetPullRequests()
+    {
+        var action = new GetPullRequestsAction(ids);
+        dispatcher.Dispatch(action);
+    }
+
+    private bool GetPullRequestsDisabled()
+    {
+        return ids.Count == 0 || pageState.Value.IsLoading || servicesState.Value.PullRequestServiceConnectionStatus != Model.ConnectionStatus.Connected;
+    }
 }
