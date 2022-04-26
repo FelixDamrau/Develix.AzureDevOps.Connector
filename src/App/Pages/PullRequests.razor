@@ -17,9 +17,9 @@
 
     <MudGrid>
         <MudItem xs="6">
-            <MultiInputNumericField ChipPrefix="PR" Label="Pull Request ID" Values="@ids" OnValuesChange="@(() => StateHasChanged())" />
+            <MultiInputNumericField ChipPrefix="PR" Label="Pull Request ID" Values="@ids" OnValuesChange="() => {}" />
         </MudItem>
-        <MudItem xs =6>
+        <MudItem xs=6>
             <MudButton OnClick="GetPullRequests" Disabled="GetPullRequestsDisabled()">
                 @if (!pageState.Value.IsLoading)
                 {
@@ -27,7 +27,7 @@
                 }
                 else
                 {
-                    <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true"/>
+                    <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
                     <MudText Class="pl-4">Loading</MudText>
                 }
             </MudButton>
