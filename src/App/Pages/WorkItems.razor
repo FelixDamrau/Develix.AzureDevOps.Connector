@@ -1,52 +1,64 @@
-﻿@page "/workitems"
-@using Develix.AzureDevOps.Connector.Model
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@page "/workitems"
+
 @using Develix.AzureDevOps.Connector.Service
+@using System.Diagnostics.CodeAnalysis
 
-<MudPaper xs=12 sm=8 Elevation="2" Class="pa-12">
+<MudPaper Elevation="2" Class="pa-4 ma-3">
     <MudGrid>
-        <MudItem xs="12">
-            <MudText Typo="Typo.h5">Get work items test page</MudText>
+        <MudItem xs="12" sm="7" lg="9">
+            <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginWorkItemServiceAction(u,t)" />
         </MudItem>
-        <MudItem xs="12" sm="8">
-            <QueryClientLogin />
+        <MudItem xs="12" sm="5" lg="3">
+            <AzureDevOpsServiceStatus />
         </MudItem>
     </MudGrid>
+
     <MudGrid>
-        <MudItem xs="12" sm="6" xl=7>
-            <MultiInputNumericField Values="@workItemIds" />
+        <MudItem xs="6">
+            <MultiInputNumericField ChipPrefix="WI" Label="Work item ID" Values="@ids" OnValuesChange="() => {}" />
         </MudItem>
-        <MudItem xs=12 sm="2" xl="1">
-            <MudPaper Elevation="2" Class="pa-4">
-                <MudButton Disabled="@(!CanGetWorkItems())" OnClick="GetWorkItems" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-                    @if (processing)
-                    {
-                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                    }
-                    else
-                    {
-                        <MudText>Load</MudText>
-                    }
-                </MudButton>
-            </MudPaper>
+        <MudItem xs=6>
+            <MudButton OnClick="GetWorkItems" Disabled="GetPullRequestsDisabled()">
+                @if (!pageState.Value.IsLoading)
+                {
+                    <MudText>Get WIs</MudText>
+                }
+                else
+                {
+                    <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="pl-4">Loading</MudText>
+                }
+            </MudButton>
         </MudItem>
-        @if (workItems is not null)
-        {
-            <MudItem xs="12">
-                <WorkItemCardView WorkItems="workItems" />
-            </MudItem>
-        }
-        @if (errorText is not null)
-        {
-            <MudItem xs="12">
-                <MudText Color="Color.Error">@errorText</MudText>
-            </MudItem>
-        }
+        <WorkItemCardView WorkItems="pageState.Value.WorkItems" />
     </MudGrid>
-
-
-
-
-
-
-
 </MudPaper>
+
+@code {
+    [Inject]
+    [NotNull]
+    private IState<WorkItemPageState>? pageState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IState<AzureDevOpsServicesState>? servicesState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IDispatcher? dispatcher { get; set; }
+
+    private readonly HashSet<int> ids = new();
+
+    private void GetWorkItems()
+    {
+        var action = new GetWorkItemsAction(ids);
+        dispatcher.Dispatch(action);
+    }
+
+    private bool GetPullRequestsDisabled()
+    {
+        return ids.Count == 0 || pageState.Value.IsLoading || servicesState.Value.WorkItemServiceConnectionStatus != Model.ConnectionStatus.Connected;
+    }
+}

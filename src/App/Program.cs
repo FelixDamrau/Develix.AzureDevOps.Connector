@@ -11,7 +11,8 @@ builder.Services.AddMudServices();
 
 var currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options => options.ScanAssemblies(currentAssembly));
-builder.Services.AddSingleton<IPullRequestService>(new PullRequestService());
+builder.Services.AddScoped(typeof(IPullRequestService), typeof(PullRequestService));
+builder.Services.AddScoped(typeof(IWorkItemService), typeof(WorkItemService));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
