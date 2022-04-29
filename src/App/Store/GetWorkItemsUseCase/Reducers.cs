@@ -3,7 +3,7 @@
 namespace Develix.AzureDevOps.Connector.App.Store.GetWorkItemsUseCase;
 public static class Reducers
 {
-    [ReducerMethod(typeof(GetPullRequestsAction))]
+    [ReducerMethod(typeof(GetWorkItemsAction))]
     public static WorkItemPageState ReduceGetWorkItemsAction(WorkItemPageState state)
     {
         return state with { IsLoading = true };
