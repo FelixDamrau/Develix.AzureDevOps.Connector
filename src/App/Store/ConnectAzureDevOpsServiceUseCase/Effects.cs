@@ -2,6 +2,7 @@
 using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.ConnectAzureDevOpsServiceUseCase;
+
 public class Effects
 {
     public Effects(IPullRequestService pullRequestService, IWorkItemService workItemService)

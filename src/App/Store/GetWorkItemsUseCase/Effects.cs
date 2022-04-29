@@ -3,6 +3,7 @@ using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.GetWorkItemsUseCase;
+
 public class Effects
 {
     private readonly IWorkItemService workItemService;

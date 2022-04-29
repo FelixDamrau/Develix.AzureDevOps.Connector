@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.ConnectAzureDevOpsServiceUseCase;
+
 public class Reducers
 {
     [ReducerMethod(typeof(LoginPullRequestServiceAction))]

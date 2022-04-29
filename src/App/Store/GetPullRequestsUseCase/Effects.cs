@@ -2,6 +2,7 @@
 using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.GetPullRequestsUseCase;
+
 public class Effects
 {
     private readonly IPullRequestService pullRequestService;

@@ -1,6 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 
 namespace Develix.AzureDevOps.Connector.Service;
+
 public interface IPullRequestService : IAzureDevOpsService
 {
     /// <summary>

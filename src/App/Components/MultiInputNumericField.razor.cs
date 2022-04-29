@@ -18,6 +18,9 @@ public partial class MultiInputNumericField
     [Parameter]
     public HashSet<int> Values { get; set; } = new();
 
+    /// <summary>
+    /// Assign any action to this <see cref="EventCallback"/>, this will cause the parent control to fire <see cref="ComponentBase.StateHasChanged"/> when the action is triggered.
+    /// </summary>
     [Parameter]
     public EventCallback OnValuesChange { get; set; }
 

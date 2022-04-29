@@ -1,6 +1,7 @@
 ﻿using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service;
+
 public interface IAzureDevOpsService
 {
     /// <summary>

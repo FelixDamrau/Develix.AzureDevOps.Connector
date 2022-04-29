@@ -29,12 +29,4 @@
     <Folder Include="wwwroot\images\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Components\AzureDevOpsServiceLogin.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Components\AzureDevOpsServiceLogin.razor" />
-  </ItemGroup>
-
 </Project>

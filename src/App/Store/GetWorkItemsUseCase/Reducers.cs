@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.GetWorkItemsUseCase;
+
 public static class Reducers
 {
     [ReducerMethod(typeof(GetWorkItemsAction))]
