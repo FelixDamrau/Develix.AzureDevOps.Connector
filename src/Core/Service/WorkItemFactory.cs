@@ -1,6 +1,6 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 
-namespace Develix.AzureDevOps.Connector.Reader;
+namespace Develix.AzureDevOps.Connector.Service;
 
 public static class WorkItemFactory
 {

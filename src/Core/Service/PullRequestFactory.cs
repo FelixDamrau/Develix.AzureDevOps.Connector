@@ -3,7 +3,7 @@ using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
-namespace Develix.AzureDevOps.Connector.Reader;
+namespace Develix.AzureDevOps.Connector.Service;
 
 internal static class PullRequestFactory
 {

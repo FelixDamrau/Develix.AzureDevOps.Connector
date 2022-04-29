@@ -1,0 +1,42 @@
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@using System.Diagnostics.CodeAnalysis
+
+<MudPaper Elevation="2" Class="pa-3">
+    <MudGrid>
+        <MudItem xs="12">
+            @if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.NotConnected)
+            {
+                <MudAlert Severity="Severity.Warning" Dense="true">Pull request service not connected</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.Connecting)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Pull request service connecting</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.Connected)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true">Pull request service connected</MudAlert>
+            }
+        </MudItem>
+        <MudItem xs="12">
+            @if (azureDevOpsServicesState.Value.WorkItemServiceConnectionStatus == Model.ConnectionStatus.NotConnected)
+            {
+                <MudAlert Severity="Severity.Warning" Dense="true">Work item service not connected</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.WorkItemServiceConnectionStatus == Model.ConnectionStatus.Connecting)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Work item service connecting</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.WorkItemServiceConnectionStatus == Model.ConnectionStatus.Connected)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true">Work item service connected</MudAlert>
+            }
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code{
+    [Inject]
+    [NotNull]
+    public IState<AzureDevOpsServicesState>? azureDevOpsServicesState { get; set; }
+}

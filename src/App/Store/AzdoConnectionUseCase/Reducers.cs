@@ -1,6 +1,7 @@
 ﻿using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.AzdoConnectionUseCase;
+
 public static class Reducers
 {
     [ReducerMethod]

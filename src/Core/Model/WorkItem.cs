@@ -13,6 +13,7 @@ public class WorkItem
     public WorkItemType WorkItemType { get; init; } = WorkItemType.Invalid;
 
     private readonly List<PullRequest> pullRequests = new();
+
     public IReadOnlyList<PullRequest> PullRequests => pullRequests;
 
     public string? AzureDevopsLink { get; init; }
