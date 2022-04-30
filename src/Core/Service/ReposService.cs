@@ -39,16 +39,15 @@ public class ReposService : IReposService, IDisposable
     [MemberNotNullWhen(true, nameof(gitHttpClient))]
     public bool IsInitialized() => state == ServiceState.Initialized && gitHttpClient is not null;
 
-    private async Task<Result<ServiceState>> Login()
+    private async Task<Result> Login()
     {
         try
         {
             var credential = new VssBasicCredential(string.Empty, azureDevopsPullRequestReadToken);
             gitHttpClient = new GitHttpClient(azureDevopsOrgUri, credential);
-            _ = await gitHttpClient.GetRepositoriesAsync(); // Perform a simple call to check if the connection is valid
-
+            var x = await gitHttpClient.GetRepositoriesAsync(); // Perform a simple call to check if the connection is valid
             state = ServiceState.Initialized;
-            return Result.Ok(ServiceState.Initialized);
+            return Result.Ok();
         }
         catch (VssUnauthorizedException e)
         {
@@ -63,10 +62,10 @@ public class ReposService : IReposService, IDisposable
             return Error("Unknown error!" + Environment.NewLine + "Error message: " + e.Message);
         }
 
-        Result<ServiceState> Error(string message)
+        Result Error(string message)
         {
             state = ServiceState.InitializationFailed;
-            return Result.Fail<ServiceState>(message);
+            return Result.Fail(message);
         }
     }
 
