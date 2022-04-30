@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public class PullRequestService : IPullRequestService, IDisposable
+public class ReposService : IReposService, IDisposable
 {
     private Uri? azureDevopsOrgUri;
     private string? azureDevopsPullRequestReadToken;
@@ -19,7 +19,7 @@ public class PullRequestService : IPullRequestService, IDisposable
     {
         this.azureDevopsOrgUri = azureDevopsOrgUri;
         this.azureDevopsPullRequestReadToken = azureDevopsPullRequestReadToken;
-        var serviceState = await LoginValid();
+        var serviceState = await Login();
         return serviceState.Valid ? Result.Ok() : Result.Fail(serviceState.Message);
     }
 
@@ -39,7 +39,7 @@ public class PullRequestService : IPullRequestService, IDisposable
     [MemberNotNullWhen(true, nameof(gitHttpClient))]
     public bool IsInitialized() => state == ServiceState.Initialized && gitHttpClient is not null;
 
-    private async Task<Result<ServiceState>> LoginValid()
+    private async Task<Result<ServiceState>> Login()
     {
         try
         {

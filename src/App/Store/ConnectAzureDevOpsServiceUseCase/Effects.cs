@@ -5,20 +5,20 @@ namespace Develix.AzureDevOps.Connector.App.Store.ConnectAzureDevOpsServiceUseCa
 
 public class Effects
 {
-    public Effects(IPullRequestService pullRequestService, IWorkItemService workItemService)
+    public Effects(IReposService reposService, IWorkItemService workItemService)
     {
-        PullRequestService = pullRequestService ?? throw new ArgumentNullException(nameof(pullRequestService));
+        ReposService = reposService ?? throw new ArgumentNullException(nameof(reposService));
         WorkItemService = workItemService ?? throw new ArgumentNullException(nameof(workItemService));
     }
 
-    public IPullRequestService PullRequestService { get; set; }
+    public IReposService ReposService { get; set; }
     public IWorkItemService WorkItemService { get; set; }
 
     [EffectMethod]
-    public async Task HandleLoginPullRequestServiceAction(LoginPullRequestServiceAction action, IDispatcher dispatcher)
+    public async Task HandleLoginRepoServiceAction(LoginRepoServiceAction action, IDispatcher dispatcher)
     {
-        var login = await PullRequestService.Initialize(action.AzureDevopsOrgUri, action.Token);
-        var resultAction = new LoginPullRequestServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
+        var login = await ReposService.Initialize(action.AzureDevopsOrgUri, action.Token);
+        var resultAction = new LoginRepoServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
     }
 

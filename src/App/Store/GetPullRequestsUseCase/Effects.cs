@@ -5,17 +5,17 @@ namespace Develix.AzureDevOps.Connector.App.Store.GetPullRequestsUseCase;
 
 public class Effects
 {
-    private readonly IPullRequestService pullRequestService;
+    private readonly IReposService reposService;
 
-    public Effects(IPullRequestService pullRequestService)
+    public Effects(IReposService reposService)
     {
-        this.pullRequestService = pullRequestService;
+        this.reposService = reposService;
     }
 
     [EffectMethod]
     public async Task HandleGetPullRequestsAction(GetPullRequestsAction action, IDispatcher dispatcher)
     {
-        var pullRequests = pullRequestService.GetPullRequests(action.Ids);
+        var pullRequests = reposService.GetPullRequests(action.Ids);
         var resultAction = new GetPullRequestsResultAction(await pullRequests.ToListAsync());
         dispatcher.Dispatch(resultAction);
     }

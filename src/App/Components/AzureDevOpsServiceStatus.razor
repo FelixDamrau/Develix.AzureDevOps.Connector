@@ -5,15 +5,15 @@
 <MudPaper Elevation="2" Class="pa-3">
     <MudGrid>
         <MudItem xs="12">
-            @if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.NotConnected)
+            @if (azureDevOpsServicesState.Value.ReposServiceConnectionStatus == Model.ConnectionStatus.NotConnected)
             {
                 <MudAlert Severity="Severity.Warning" Dense="true">Pull request service not connected</MudAlert>
             }
-            else if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.Connecting)
+            else if (azureDevOpsServicesState.Value.ReposServiceConnectionStatus == Model.ConnectionStatus.Connecting)
             {
                 <MudAlert Severity="Severity.Info" Dense="true">Pull request service connecting</MudAlert>
             }
-            else if (azureDevOpsServicesState.Value.PullRequestServiceConnectionStatus == Model.ConnectionStatus.Connected)
+            else if (azureDevOpsServicesState.Value.ReposServiceConnectionStatus == Model.ConnectionStatus.Connected)
             {
                 <MudAlert Severity="Severity.Success" Dense="true">Pull request service connected</MudAlert>
             }

@@ -8,7 +8,7 @@
 <MudPaper Elevation="2" Class="pa-4 ma-3">
     <MudGrid>
         <MudItem xs="12" sm="7" lg="9">
-            <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginPullRequestServiceAction(u,t)" />
+            <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginRepoServiceAction(u,t)" />
         </MudItem>
         <MudItem xs="12" sm="5" lg="3">
             <AzureDevOpsServiceStatus />
@@ -59,6 +59,6 @@
 
     private bool GetPullRequestsDisabled()
     {
-        return ids.Count == 0 || pageState.Value.IsLoading || servicesState.Value.PullRequestServiceConnectionStatus != Model.ConnectionStatus.Connected;
+        return ids.Count == 0 || pageState.Value.IsLoading || servicesState.Value.ReposServiceConnectionStatus != Model.ConnectionStatus.Connected;
     }
 }

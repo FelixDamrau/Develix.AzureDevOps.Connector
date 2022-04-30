@@ -14,11 +14,11 @@ public class WorkItemService : IWorkItemService, IDisposable
     private WorkItemTrackingHttpClient? workItemTrackingHttpClient;
     private ServiceState state { get; set; }
     private bool disposedValue;
-    private readonly IPullRequestService pullRequestService;
+    private readonly IReposService reposService;
 
-    public WorkItemService(IPullRequestService pullRequestService)
+    public WorkItemService(IReposService reposService)
     {
-        this.pullRequestService = pullRequestService;
+        this.reposService = reposService;
     }
 
     /// <inheritdoc/>
@@ -67,7 +67,7 @@ public class WorkItemService : IWorkItemService, IDisposable
         {
             var prIds = prRelations.Select(prr => PullRequestFactory.GetPullRequestId(prr)).Where(r => r.Valid).Select(r => r.Value);
 
-            var gitPrs = pullRequestService.GetPullRequests(prIds);
+            var gitPrs = reposService.GetPullRequests(prIds);
             await foreach (var pr in gitPrs)
             {
                 workItem.AddPullRequest(pr);
