@@ -11,8 +11,8 @@ builder.Services.AddMudServices();
 
 var currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options => options.ScanAssemblies(currentAssembly));
-builder.Services.AddScoped(typeof(IReposService), typeof(ReposService));
-builder.Services.AddScoped(typeof(IWorkItemService), typeof(WorkItemService));
+builder.Services.AddScoped<IReposService, ReposService>();
+builder.Services.AddScoped<IWorkItemService, WorkItemService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
