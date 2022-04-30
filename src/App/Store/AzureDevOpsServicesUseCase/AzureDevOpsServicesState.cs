@@ -1,7 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.App.Model;
 using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store;
+namespace Develix.AzureDevOps.Connector.App.Store.AzureDevOpsServicesUseCase;
 
 [FeatureState]
 public record AzureDevOpsServicesState

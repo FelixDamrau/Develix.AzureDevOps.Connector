@@ -1,5 +1,6 @@
 ﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
+@using Develix.AzureDevOps.Connector.App.Store.AzureDevOpsServicesUseCase
 @using System.Diagnostics.CodeAnalysis
 
 <MudPaper Elevation="2" Class="pa-3">
@@ -35,7 +36,7 @@
     </MudGrid>
 </MudPaper>
 
-@code{
+@code {
     [Inject]
     [NotNull]
     public IState<AzureDevOpsServicesState>? azureDevOpsServicesState { get; set; }

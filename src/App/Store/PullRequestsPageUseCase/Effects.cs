@@ -1,7 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store.GetPullRequestsUseCase;
+namespace Develix.AzureDevOps.Connector.App.Store.PullRequestsPageUseCase;
 
 public class Effects
 {

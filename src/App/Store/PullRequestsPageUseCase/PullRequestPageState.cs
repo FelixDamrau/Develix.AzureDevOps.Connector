@@ -1,7 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
 using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store;
+namespace Develix.AzureDevOps.Connector.App.Store.PullRequestsPageUseCase;
 
 [FeatureState]
 public record PullRequestPageState

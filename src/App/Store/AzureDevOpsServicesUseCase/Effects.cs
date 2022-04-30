@@ -1,7 +1,7 @@
 ﻿using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store.ConnectAzureDevOpsServiceUseCase;
+namespace Develix.AzureDevOps.Connector.App.Store.AzureDevOpsServicesUseCase;
 
 public class Effects
 {
