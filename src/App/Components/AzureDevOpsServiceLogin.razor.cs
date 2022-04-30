@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Develix.AzureDevOps.Connector.App.Store;
-using Develix.AzureDevOps.Connector.App.Store.AzureDevOpsServicesUseCase;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -12,10 +11,6 @@ public partial class AzureDevOpsServiceLogin
     private Uri? azureDevopsOrgUri;
     private string? token;
     private readonly Converter<Uri> converter = new() { SetFunc = value => value?.AbsoluteUri ?? string.Empty, GetFunc = text => new Uri(text), };
-
-    [Inject]
-    [NotNull]
-    private IState<AzureDevOpsServicesState>? azureServicesState { get; set; }
 
     [Inject]
     [NotNull]
