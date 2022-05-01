@@ -117,7 +117,7 @@ public class WorkItemService : IWorkItemService, IDisposable
         {
             var credential = new VssBasicCredential(string.Empty, azureDevopsWorkItemReadToken);
             workItemTrackingHttpClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
-            _ = await workItemTrackingHttpClient.GetWorkItemIconsAsync(); // Perform a simple call to check if the connection is valid
+            _ = await GetExistingWorkItemsIds(workItemTrackingHttpClient, new[] { 367 }); // Perform a simple call to check if the connection is valid
 
             state = ServiceState.Initialized;
             return Result.Ok(ServiceState.Initialized);
