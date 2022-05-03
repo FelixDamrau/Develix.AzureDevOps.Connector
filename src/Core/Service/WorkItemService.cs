@@ -27,6 +27,9 @@ public class WorkItemService : IWorkItemService, IDisposable
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
 
+        if (!ids.Any())
+            return Result.Ok<IReadOnlyList<Model.WorkItem>>(new List<Model.WorkItem>());
+
         var queryResults = await RunQueryAsync(workItemTrackingHttpClient, ids);
         var workItems = new List<Model.WorkItem>();
         if (!queryResults.Valid)
