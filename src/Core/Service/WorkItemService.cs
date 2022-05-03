@@ -27,10 +27,14 @@ public class WorkItemService : IWorkItemService, IDisposable
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
 
+        if (!ids.Any())
+            return Result.Ok<IReadOnlyList<Model.WorkItem>>(Array.Empty<Model.WorkItem>());
+
         var queryResults = await RunQueryAsync(workItemTrackingHttpClient, ids);
-        var workItems = new List<Model.WorkItem>();
         if (!queryResults.Valid)
             return Result.Fail<IReadOnlyList<Model.WorkItem>>(queryResults.Message);
+
+        var workItems = new List<Model.WorkItem>();
         foreach (var azureDevopsWorkItem in queryResults.Value)
         {
             var workItem = await Create(azureDevopsWorkItem, azureDevopsOrgUri, includePullRequests);
