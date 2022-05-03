@@ -2,7 +2,10 @@
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public interface IPullRequestService : IAzureDevOpsService
+/// <summary>
+/// This service connects to Azure Repos.
+/// </summary>
+public interface IReposService : IAzureDevOpsService
 {
     /// <summary>
     /// Gets all pull requests with the given <paramref name="ids"/>.

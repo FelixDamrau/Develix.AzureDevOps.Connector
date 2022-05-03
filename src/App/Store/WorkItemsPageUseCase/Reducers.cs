@@ -1,6 +1,6 @@
 ﻿using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store.GetWorkItemsUseCase;
+namespace Develix.AzureDevOps.Connector.App.Store.WorkItemsPageUseCase;
 
 public static class Reducers
 {

@@ -1,6 +1,6 @@
 ﻿using Fluxor;
 
-namespace Develix.AzureDevOps.Connector.App.Store.GetPullRequestsUseCase;
+namespace Develix.AzureDevOps.Connector.App.Store.PullRequestsPageUseCase;
 
 public static class Reducers
 {

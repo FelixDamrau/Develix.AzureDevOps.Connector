@@ -14,10 +14,6 @@ public partial class AzureDevOpsServiceLogin
 
     [Inject]
     [NotNull]
-    private IState<AzureDevOpsServicesState>? azureServicesState { get; set; }
-
-    [Inject]
-    [NotNull]
     private IDispatcher? dispatcher { get; set; }
 
     [Parameter]

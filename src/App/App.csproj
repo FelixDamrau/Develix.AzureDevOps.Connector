@@ -11,10 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Components\QueryClientLogin.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Fluxor.Blazor.Web" Version="5.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.15.0" />
     <PackageReference Include="MudBlazor" Version="6.0.9" />
