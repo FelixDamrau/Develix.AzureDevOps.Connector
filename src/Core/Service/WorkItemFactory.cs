@@ -75,5 +75,5 @@ public static class WorkItemFactory
         return WorkItemType.Unknown;
     }
 
-    private static string GetAzureDevopsLink(string azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
+    private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
 }
