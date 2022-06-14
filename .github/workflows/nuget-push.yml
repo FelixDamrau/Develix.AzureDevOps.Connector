@@ -23,7 +23,7 @@ jobs:
     - name: Publish to NuGet 🚀
       uses: FelixDamrau/publish-nuget@v2.5.6
       with:
-        PACKAGE_NAME: 'Develix.CredentialStore.Win32'
+        PACKAGE_NAME: 'Develix.AzureDevOps.Connector'
         PROJECT_FILE_PATH: 'src/Core/Core.csproj'
         VERSION_REGEX: '^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$'
         TAG_FORMAT: '*'
