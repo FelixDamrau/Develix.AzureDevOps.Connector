@@ -10,7 +10,7 @@ public static class WorkItemFactory
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
         var workItemType = GetWorkItemKind(workItem);
-        var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri.AbsoluteUri, teamProject, workItem.Id);
+        var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
         return new WorkItem
         {
             Id = workItem.Id ?? -1,
