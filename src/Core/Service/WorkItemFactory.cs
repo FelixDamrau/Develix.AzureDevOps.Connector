@@ -10,7 +10,7 @@ public static class WorkItemFactory
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
         var workItemType = GetWorkItemKind(workItem);
-        var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri.AbsoluteUri, teamProject, workItem.Id);
+        var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
         return new WorkItem
         {
             Id = workItem.Id ?? -1,
@@ -75,5 +75,5 @@ public static class WorkItemFactory
         return WorkItemType.Unknown;
     }
 
-    private static string GetAzureDevopsLink(string azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
+    private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
 }
