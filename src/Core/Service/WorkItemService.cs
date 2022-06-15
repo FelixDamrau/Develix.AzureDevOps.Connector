@@ -89,7 +89,7 @@ public class WorkItemService : IWorkItemService, IDisposable
                 return Result.Ok<IReadOnlyList<WorkItem>>(Array.Empty<WorkItem>());
 
             var workItems = await client.GetWorkItemsAsync(
-                ids: ids,
+                ids: existingIds,
                 asOf: result.AsOf,
                 expand: WorkItemExpand.Relations)
                 .ConfigureAwait(false);
