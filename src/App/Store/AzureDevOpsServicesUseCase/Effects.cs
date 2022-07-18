@@ -17,7 +17,8 @@ public class Effects
     [EffectMethod]
     public async Task HandleLoginRepoServiceAction(LoginRepoServiceAction action, IDispatcher dispatcher)
     {
-        var login = await ReposService.Initialize(action.AzureDevopsOrgUri, action.Token);
+        var uri = GetUriWithTrailingSlash(action.AzureDevopsOrgUri);
+        var login = await ReposService.Initialize(uri, action.Token);
         var resultAction = new LoginRepoServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
     }
@@ -25,8 +26,19 @@ public class Effects
     [EffectMethod]
     public async Task HandleLoginWorkItemServiceAction(LoginWorkItemServiceAction action, IDispatcher dispatcher)
     {
-        var login = await WorkItemService.Initialize(action.AzureDevopsOrgUri, action.Token);
+        var uri = GetUriWithTrailingSlash(action.AzureDevopsOrgUri);
+        var login = await WorkItemService.Initialize(uri, action.Token);
         var resultAction = new LoginWorkItemServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
+    }
+
+    /// <summary>
+    /// Some features expect the absolute uri to end with an slash. So we normalize all azure devops organization uris to include the trailing slash.
+    /// </summary>
+    private static Uri GetUriWithTrailingSlash(Uri uri)
+    {
+        if (uri.AbsoluteUri[^1] == '/')
+            return uri;
+        return new Uri(uri.AbsoluteUri + '/');
     }
 }
