@@ -13,6 +13,7 @@ var currentAssembly = typeof(Program).Assembly;
 builder.Services.AddFluxor(options => options.ScanAssemblies(currentAssembly));
 builder.Services.AddScoped<IReposService, ReposService>();
 builder.Services.AddScoped<IWorkItemService, WorkItemService>();
+builder.Services.AddScoped<IPackagesService, PackagesService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
