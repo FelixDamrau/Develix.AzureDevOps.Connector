@@ -23,20 +23,20 @@ public class Reducers
     }
 
     [ReducerMethod]
-    public static AzureDevOpsServicesState ReduceLoginWorkItemServiceResultAction(AzureDevOpsServicesState state, LoginPackagesServiceResultAction action)
+    public static AzureDevOpsServicesState ReduceLoginWorkItemServiceResultAction(AzureDevOpsServicesState state, LoginWorkItemServiceResultAction action)
     {
         return state with { WorkItemServiceConnectionStatus = action.ConnectionStatus };
     }
 
-    [ReducerMethod(typeof(LoginWorkItemServiceAction))]
+    [ReducerMethod(typeof(LoginPackagesServiceAction))]
     public static AzureDevOpsServicesState ReduceLoginPackagesServiceAction(AzureDevOpsServicesState state)
     {
-        return state with { WorkItemServiceConnectionStatus = Model.ConnectionStatus.Connecting };
+        return state with { PackagesServiceConnectionStatus = Model.ConnectionStatus.Connecting };
     }
 
     [ReducerMethod]
     public static AzureDevOpsServicesState ReduceLoginPackagesServiceResultAction(AzureDevOpsServicesState state, LoginPackagesServiceResultAction action)
     {
-        return state with { WorkItemServiceConnectionStatus = action.ConnectionStatus };
+        return state with { PackagesServiceConnectionStatus = action.ConnectionStatus };
     }
 }

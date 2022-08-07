@@ -33,6 +33,20 @@
                 <MudAlert Severity="Severity.Success" Dense="true">Work item service connected</MudAlert>
             }
         </MudItem>
+        <MudItem xs="12">
+            @if (azureDevOpsServicesState.Value.PackagesServiceConnectionStatus == Model.ConnectionStatus.NotConnected)
+            {
+                <MudAlert Severity="Severity.Warning" Dense="true">Packages service not connected</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.PackagesServiceConnectionStatus == Model.ConnectionStatus.Connecting)
+            {
+                <MudAlert Severity="Severity.Info" Dense="true">Packages service connecting</MudAlert>
+            }
+            else if (azureDevOpsServicesState.Value.PackagesServiceConnectionStatus == Model.ConnectionStatus.Connected)
+            {
+                <MudAlert Severity="Severity.Success" Dense="true">Packages service connected</MudAlert>
+            }
+        </MudItem>
     </MudGrid>
 </MudPaper>
 

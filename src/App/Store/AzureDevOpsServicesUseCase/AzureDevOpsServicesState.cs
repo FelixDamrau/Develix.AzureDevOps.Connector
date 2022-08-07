@@ -8,4 +8,5 @@ public record AzureDevOpsServicesState
 {
     public ConnectionStatus ReposServiceConnectionStatus { get; init; } = ConnectionStatus.NotConnected;
     public ConnectionStatus WorkItemServiceConnectionStatus { get; init; } = ConnectionStatus.NotConnected;
+    public ConnectionStatus PackagesServiceConnectionStatus { get; init; } = ConnectionStatus.NotConnected;
 }
