@@ -15,27 +15,27 @@ public partial class PackagesService : IPackagesService
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Package>>("Service was not initialized");
 
-        var responseObjectResult = await packageServiceHttpClient.GetAllPackages(project, feed);
-        if (!responseObjectResult.Valid)
-            return Result.Fail<IReadOnlyList<Package>>($"Could not get packages. Message: {responseObjectResult.Message}");
+        var result = await packageServiceHttpClient.GetAllPackages(project, feed);
+        if (!result.Valid)
+            return Result.Fail<IReadOnlyList<Package>>($"Could not get packages. Message: {result.Message}");
 
-        var packages = responseObjectResult.Value.value
-            .Select(p =>
-                new Package()
-                {
-                    Id = p.id,
-                    Name = p.name,
-                    Versions = p.versions
-                    .Select(v => new PackageVersion
-                    {
-                        Version = v.normalizedVersion,
-                        PublishDate = v.publishDate
-                    })
-                    .ToArray(),
-                })
+        var packages = result.Value.value
+            .Select(p => ToPackage(p))
             .ToList();
 
         return Result.Ok<IReadOnlyList<Package>>(packages);
+    }
+
+    public async Task<Result<Package>> GetPackage(string project, string feed, string packageName)
+    {
+        if (!IsInitialized())
+            return Result.Fail<Package>("Service was not initialized");
+
+        var result = await packageServiceHttpClient.GetPackage(project, feed, packageName);
+        if (!result.Valid)
+            return Result.Fail<Package>($"Could not get packages. Message: {result.Message}");
+
+        return Result.Ok(ToPackage(result.Value));
     }
 
     public async Task<Result> Initialize(Uri azureDevopsOrgUri, string token)
@@ -49,4 +49,20 @@ public partial class PackagesService : IPackagesService
 
     [MemberNotNullWhen(true, nameof(packageServiceHttpClient))]
     public bool IsInitialized() => state == ServiceState.Initialized && packageServiceHttpClient is not null;
+
+    private static Package ToPackage(Value p)
+    {
+        return new()
+        {
+            Id = p.id,
+            Name = p.name,
+            Versions = p.versions
+                .Select(v => new PackageVersion
+                {
+                    Version = v.normalizedVersion,
+                    PublishDate = v.publishDate
+                })
+                .ToArray(),
+        };
+    }
 }

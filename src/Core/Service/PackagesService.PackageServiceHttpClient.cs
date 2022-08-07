@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Develix.AzureDevOps.Connector.Model;
 using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service;
@@ -39,6 +40,61 @@ public partial class PackagesService
                 => new($"{baseUri}{project}/_apis/packaging/Feeds/{feed}/packages?includeAllVersions=true&api-version=6.0-preview.1");
         }
 
+        public async Task<Result<Value>> GetPackage(string project, string feed, string packageName)
+        {
+            var packageIdResult = await GetPackageId(project, feed, packageName);
+            if (!packageIdResult.Valid)
+                return Result.Fail<Value>(packageIdResult.Message);
+
+            var request = new HttpRequestMessage
+            {
+                RequestUri = GetRequestUri(project, feed, packageIdResult.Value),
+                Method = HttpMethod.Get,
+            };
+
+            var response = await httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonSerializer.Deserialize<Value>(result) ?? new();
+                return Result.Ok(responseObject);
+            }
+            return Result.Fail<Value>((response.ReasonPhrase ?? "No Reason given") + $" ({(int)response.StatusCode})");
+
+            Uri GetRequestUri(string project, string feed, Guid packageId)
+                => new($"{baseUri}{project}/_apis/packaging/Feeds/{feed}/packages/{packageId}/?includeAllVersions=true&api-version=6.0-preview.1");
+        }
+
+        private async Task<Result<Guid>> GetPackageId(string project, string feed, string packageName)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = GetRequestUri(project, feed, packageName),
+                Method = HttpMethod.Get,
+            };
+
+            var response = await httpClient.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonSerializer.Deserialize<ResponseObject>(result);
+
+                if(responseObject is null)
+                    return Result.Fail<Guid>($"Could not deserialize the httpResponse: [{result}]");
+
+                return responseObject.count switch
+                {
+                    < 1 => Result.Fail<Guid>($"No packages with name '{packageName}' were found on feed '{feed}' of project '{project}'."),
+                    1 => Result.Ok(responseObject.value.Single().id),
+                    > 1 => Result.Fail<Guid>($"Multiple ({string.Join(",", responseObject.value.Select(p => p.normalizedName))}) packages with name '{packageName}' were found on feed '{feed}' of project '{project}'."),
+                };
+            }
+            return Result.Fail<Guid>((response.ReasonPhrase ?? "No Reason given") + $" ({(int)response.StatusCode})");
+
+            Uri GetRequestUri(string project, string feed, string packageName)
+                => new($"{baseUri}{project}/_apis/packaging/Feeds/{feed}/packages/?packageNameQuery={packageName}&api-version=6.0-preview.1");
+        }
+
         /// <summary>
         /// This sends a small request to test if the connection is successful.
         /// </summary>
@@ -53,7 +109,6 @@ public partial class PackagesService
             return result.IsSuccessStatusCode ? Result.Ok() : Result.Fail(result.ReasonPhrase ?? "Error unknown");
         }
     }
-
 
     // These classes were auto-generated from the GetAllPackages http response.
     private class ResponseObject
