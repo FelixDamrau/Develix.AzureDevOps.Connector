@@ -18,7 +18,7 @@ public partial class PackagesService
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {base64EncodedToken}");
         }
 
-        public async Task<ResponseObject> GetAllPackages(string project, string feed)
+        public async Task<Result<ResponseObject>> GetAllPackages(string project, string feed)
         {
             var request = new HttpRequestMessage
             {
@@ -27,8 +27,13 @@ public partial class PackagesService
             };
 
             var response = await httpClient.SendAsync(request);
-            var result = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<ResponseObject>(result) ?? new();
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadAsStringAsync();
+                var responseObject = JsonSerializer.Deserialize<ResponseObject>(result) ?? new();
+                return Result.Ok(responseObject);
+            }
+            return Result.Fail<ResponseObject>((response.ReasonPhrase ?? "No Reason given") + $" ({(int)response.StatusCode})");
 
             Uri GetRequestUri(string project, string feed)
                 => new($"{baseUri}{project}/_apis/packaging/Feeds/{feed}/packages?includeAllVersions=true&api-version=6.0-preview.1");

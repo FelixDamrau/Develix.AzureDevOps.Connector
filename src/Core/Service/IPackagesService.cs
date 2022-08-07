@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service;
 /// <summary>
@@ -9,5 +10,5 @@ public interface IPackagesService : IAzureDevOpsService
     /// <summary>
     /// Gets all packages.
     /// </summary>
-    public IAsyncEnumerable<Package> GetPackages(string project, string feed);
+    public Task<Result<IReadOnlyList<Package>>> GetPackages(string project, string feed);
 }
