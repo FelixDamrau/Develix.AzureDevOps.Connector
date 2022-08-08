@@ -33,7 +33,7 @@ public partial class PackagesService : IPackagesService
 
         var result = await packageServiceHttpClient.GetPackage(project, feed, packageName);
         if (!result.Valid)
-            return Result.Fail<Package>($"Could not get packages. Message: {result.Message}");
+            return Result.Fail<Package>($"Could not get package. Message: {result.Message}");
 
         return Result.Ok(ToPackage(result.Value));
     }
