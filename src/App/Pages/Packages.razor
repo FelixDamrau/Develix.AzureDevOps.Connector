@@ -1,0 +1,93 @@
+﻿@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+@page "/packages"
+
+@using System.Diagnostics.CodeAnalysis
+@using Develix.AzureDevOps.Connector.App.Store.AzureDevOpsServicesUseCase
+@using Develix.AzureDevOps.Connector.App.Store.PackagesPageUseCase
+@using Develix.AzureDevOps.Connector.App.Store.PullRequestsPageUseCase
+
+<MudPaper Elevation="2" Class="pa-4 ma-3">
+    <MudGrid>
+        <MudItem xs="12" sm="7" lg="9">
+            <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginPackagesServiceAction(u,t)" />
+        </MudItem>
+        <MudItem xs="12" sm="5" lg="3">
+            <AzureDevOpsServiceStatus />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid>
+        <MudItem xs="3" md="2">
+            <MudButton OnClick="GetAllPackages" Disabled="@GetAllPackagesDisabled()">Get All</MudButton>
+        </MudItem>
+        <MudItem xs="3" md="2">
+            <MudButton OnClick="GetPackage" Disabled="@GetPackageDisabled()">Get Specific</MudButton>
+        </MudItem>
+    </MudGrid>
+    <MudGrid>
+        <MudItem xs="4" md="3">
+            <MudTextField @bind-Value="project" Label="Azure Devops Project" Immediate="true" />
+        </MudItem>
+        <MudItem xs="4" md="3">
+            <MudTextField @bind-Value="feed" Label="Azure Devops Feed" />
+        </MudItem>
+        <MudItem xs="4" md="3">
+            <MudTextField @bind-Value="packageName" Label="Package Name" />
+        </MudItem>
+        @if (pageState.Value.ErrorMessage is not null)
+        {
+            <MudItem xs="12">
+                <MudAlert Severity="Severity.Error">@pageState.Value.ErrorMessage</MudAlert>
+            </MudItem>
+        }
+        <PackageCardView Packages="pageState.Value.Packages" />
+    </MudGrid>
+</MudPaper>
+
+@code {
+    [Inject]
+    [NotNull]
+    private IState<AzureDevOpsServicesState>? servicesState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IState<PackagesPageState>? pageState { get; set; }
+
+    [Inject]
+    [NotNull]
+    private IDispatcher? dispatcher { get; set; }
+
+    private string? project;
+    private string? feed;
+    private string? packageName;
+
+    private void GetAllPackages()
+    {
+        var action = new GetAllPackagesAction(project!, feed!);
+        dispatcher.Dispatch(action);
+    }
+
+    private void GetPackage()
+    {
+        var action = new GetPackageAction(project!, feed!, packageName!);
+        dispatcher.Dispatch(action);
+    }
+
+    private bool GetAllPackagesDisabled()
+    {
+        return string.IsNullOrEmpty(project)
+            || string.IsNullOrEmpty(feed)
+            || pageState.Value.IsLoading
+            || servicesState.Value.PackagesServiceConnectionStatus != Model.ConnectionStatus.Connected;
+    }
+
+    private bool GetPackageDisabled()
+    {
+        return string.IsNullOrEmpty(project)
+            || string.IsNullOrEmpty(feed)
+            || string.IsNullOrEmpty(packageName)
+            || pageState.Value.IsLoading
+            || servicesState.Value.PackagesServiceConnectionStatus != Model.ConnectionStatus.Connected;
+    }
+}

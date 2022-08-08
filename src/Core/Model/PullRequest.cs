@@ -4,19 +4,9 @@ public record PullRequest
 {
     public int Id { get; init; } = -1;
 
-    public PullRequestStatus Status { get; init; }
+    public PullRequestStatus Status { get; init; } = PullRequestStatus.Invalid;
 
-    private string author = "Author unknown";
-    public string Author
-    {
-        get { return author; }
-        init { author = value ?? throw new ArgumentNullException(nameof(Author)); }
-    }
+    public string Author { get; init; } = "Unknwon";
 
-    private string title = "Name unknown";
-    public string Title
-    {
-        get { return title; }
-        init { title = value ?? throw new ArgumentNullException(nameof(Title)); }
-    }
+    public string Title { get; init; } = "Unknown";
 }

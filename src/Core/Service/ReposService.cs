@@ -45,7 +45,7 @@ public class ReposService : IReposService, IDisposable
         {
             var credential = new VssBasicCredential(string.Empty, azureDevopsPullRequestReadToken);
             gitHttpClient = new GitHttpClient(azureDevopsOrgUri, credential);
-            var x = await gitHttpClient.GetRepositoriesAsync(); // Perform a simple call to check if the connection is valid
+            _ = await gitHttpClient.GetRepositoriesAsync(); // Perform a simple call to check if the connection is valid
             state = ServiceState.Initialized;
             return Result.Ok();
         }

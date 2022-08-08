@@ -8,8 +8,8 @@ public interface IAzureDevOpsService
     /// Initializes this service.
     /// </summary>
     /// <param name="azureDevopsOrgUri">The URI of the azure devops organization (e.g.: https://dev.azure.com/myOrgName/).</param>
-    /// <param name="azureDevopsPullRequestReadToken">A token the provided <paramref name="orgName"/> with at least a pull request read permission.</param>
-    Task<Result> Initialize(Uri azureDevopsOrgUri, string azureDevopsPullRequestReadToken);
+    /// <param name="token">A token the provided <paramref name="orgName"/>.</param>
+    Task<Result> Initialize(Uri azureDevopsOrgUri, string token);
 
     /// <summary>
     /// Checks if the service is successfully initialized.

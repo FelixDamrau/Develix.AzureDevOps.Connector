@@ -1,0 +1,16 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+
+<MudGrid>
+    @foreach (var package in Packages ?? Enumerable.Empty<Package>())
+    {
+        <MudItem xs="12" sm="4" lg="3">
+            <PackageCard Package="package" />
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IEnumerable<Package>? Packages { get; set; }
+}

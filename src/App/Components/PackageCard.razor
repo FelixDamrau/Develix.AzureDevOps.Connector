@@ -1,0 +1,25 @@
+﻿@using Develix.AzureDevOps.Connector.Model
+@using System.Diagnostics.CodeAnalysis
+
+<MudCard>
+    <MudCardContent>
+        <MudText Typo="Typo.subtitle2">@Package.Name</MudText>
+        <MudGrid>
+            <MudItem xs="12">
+                <MudText>Versions:</MudText>
+                @foreach (var version in Package.Versions)
+                {
+                    <MudChip Size="Size.Small">@version.Version</MudChip>
+                }
+            </MudItem>
+
+        </MudGrid>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    [NotNull]
+    public Package? Package { get; set; }
+}
