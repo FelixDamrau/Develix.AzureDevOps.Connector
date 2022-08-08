@@ -27,4 +27,20 @@ public class Effects
             dispatcher.Dispatch(resultAction);
         }
     }
+
+    [EffectMethod]
+    public async Task HandleGetPackageAction(GetPackageAction action, IDispatcher dispatcher)
+    {
+        var packageResult = await packagesService.GetPackage(action.Project, action.Feed, action.PackageName);
+        if (packageResult.Valid)
+        {
+            var resultAction = new GetPackageResultAction(packageResult.Value);
+            dispatcher.Dispatch(resultAction);
+        }
+        else
+        {
+            var resultAction = new GetPackageResultAction(null, packageResult.Message); // TODO Error handling!
+            dispatcher.Dispatch(resultAction);
+        }
+    }
 }
