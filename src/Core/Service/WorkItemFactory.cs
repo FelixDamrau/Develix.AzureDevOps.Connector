@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.AzureDevOps.Connector.Service.Logic;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
@@ -70,7 +71,7 @@ public class WorkItemFactory
         if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression
             && workItem.Fields["System.TeamProject"] is string teamProject)
         {
-            return await workItemTypeCache.GetWorkItemType(teamProject, workItemTypeExpression);
+            return await workItemTypeCache.Get(teamProject, workItemTypeExpression);
         }
         return WorkItemType.Invalid;
     }
