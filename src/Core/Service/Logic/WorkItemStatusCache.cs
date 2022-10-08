@@ -16,6 +16,6 @@ internal class WorkItemStatusCache : Cache<WorkItemStatus, WorkItemStatusCacheKe
         var cache = workItemStatus
             .Select(tfWis => new WorkItemStatus(tfWis.Name, tfWis.Color, tfWis.Category))
             .ToDictionary(wis => wis.Name);
-        return new ItemCache(cache);
+        return new(cache);
     }
 }
