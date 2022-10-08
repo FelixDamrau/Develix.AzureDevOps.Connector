@@ -3,12 +3,13 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service.Logic;
 
-internal abstract class Cache<T>
+internal abstract class Cache<T, TKey>
     where T : class
+    where TKey : ICacheKey
 {
     protected readonly WorkItemTrackingHttpClient workItemTrackingHttpClient;
     private readonly T fallback;
-    private readonly Dictionary<string, ProjectItemCache> cache;
+    private readonly Dictionary<TKey, ItemCache> cache;
 
     protected Cache(WorkItemTrackingHttpClient workItemTrackingHttpClient, T fallback)
     {
@@ -17,32 +18,30 @@ internal abstract class Cache<T>
         cache = new();
     }
 
-    public async Task<T> Get(string project, string key)
+    public async Task<T> Get(TKey cacheReference, string key)
     {
-        var itemCache = await GetItemCache(project);
+        var itemCache = await GetItemCache(cacheReference);
         if (itemCache.TryGetValue(key, out var value))
             return value;
         return fallback;
     }
 
-    private async Task<ProjectItemCache> GetItemCache(string project)
+    private async Task<ItemCache> GetItemCache(TKey key)
     {
-        if (!cache.ContainsKey(project))
-            cache[project] = await CreateItemCache(project);
+        if (!cache.ContainsKey(key))
+            cache[key] = await CreateItemCache(key);
 
-        return cache[project];
+        return cache[key];
     }
 
-    protected abstract Task<ProjectItemCache> CreateItemCache(string project);
+    protected abstract Task<ItemCache> CreateItemCache(TKey key);
 
-    protected class ProjectItemCache
+    protected class ItemCache
     {
         private IReadOnlyDictionary<string, T> cache;
-        public string Project { get; }
 
-        public ProjectItemCache(string project, IReadOnlyDictionary<string, T> cache)
+        public ItemCache(IReadOnlyDictionary<string, T> cache)
         {
-            Project = project;
             this.cache = cache;
         }
 

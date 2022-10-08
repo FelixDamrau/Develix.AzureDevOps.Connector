@@ -1,15 +1,18 @@
 ﻿namespace Develix.AzureDevOps.Connector.Model;
 
-public enum WorkItemStatus
+public class WorkItemStatus
 {
-    Invalid = 0,
-    New,
-    Approved,
-    Committed,
-    Done,
-    Removed,
-    InProgress,
-    Open,
-    Closed,
-    ToDo
+    public WorkItemStatus(string name, string color, string category)
+    {
+        Name = name;
+        Color = color;
+        Category = category;
+    }
+
+    public string Name { get; }
+    public string Color { get; set; }
+    public string Category { get; }
+
+    public static WorkItemStatus Unknown { get; } = new("Unknown", "FF0000", "Unknown");
+    public static WorkItemStatus Invalid { get; } = new("Invalid", "FF0000", "Invalid");
 }
