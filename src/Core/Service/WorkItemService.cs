@@ -9,12 +9,13 @@ namespace Develix.AzureDevOps.Connector.Service;
 
 public class WorkItemService : IWorkItemService, IDisposable
 {
+    private readonly IReposService reposService;
+
     private Uri? azureDevopsOrgUri;
     private string? azureDevopsWorkItemReadToken;
+    private ServiceState state;
+    private WorkItemFactory? workItemFactory;
     private WorkItemTrackingHttpClient? workItemTrackingHttpClient;
-    private ServiceState state { get; set; }
-    private bool disposedValue;
-    private readonly IReposService reposService;
 
     public WorkItemService(IReposService reposService)
     {
@@ -37,7 +38,7 @@ public class WorkItemService : IWorkItemService, IDisposable
         var workItems = new List<Model.WorkItem>();
         foreach (var azureDevopsWorkItem in queryResults.Value)
         {
-            var workItem = await Create(azureDevopsWorkItem, azureDevopsOrgUri, includePullRequests);
+            var workItem = await Create(azureDevopsWorkItem, azureDevopsOrgUri, includePullRequests, workItemFactory);
             workItems.Add(workItem);
         }
         return Result.Ok<IReadOnlyList<Model.WorkItem>>(workItems);
@@ -49,16 +50,23 @@ public class WorkItemService : IWorkItemService, IDisposable
         this.azureDevopsOrgUri = azureDevopsOrgUri;
         this.azureDevopsWorkItemReadToken = azureDevopsWorkItemReadToken;
         var serviceState = await Login();
+        workItemFactory = new WorkItemFactory(workItemTrackingHttpClient);
         return serviceState.Valid ? Result.Ok() : Result.Fail(serviceState.Message);
     }
 
     /// <inheritdoc/>
-    [MemberNotNullWhen(true, nameof(workItemTrackingHttpClient), nameof(azureDevopsOrgUri))]
-    public bool IsInitialized() => state == ServiceState.Initialized && workItemTrackingHttpClient is not null;
-
-    private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests)
+    [MemberNotNullWhen(true, nameof(workItemTrackingHttpClient), nameof(azureDevopsOrgUri), nameof(workItemFactory))]
+    public bool IsInitialized()
     {
-        var workItem = WorkItemFactory.Create(azureDevopsWorkItem, baseOrgUri);
+        return state == ServiceState.Initialized
+            && workItemTrackingHttpClient is not null
+            && azureDevopsOrgUri is not null
+            && workItemFactory is not null;
+    }
+
+    private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)
+    {
+        var workItem = await workItemFactory.Create(azureDevopsWorkItem, baseOrgUri);
         if (includePullRequests)
             await AddPullRequests(azureDevopsWorkItem, workItem);
         return workItem;
@@ -115,14 +123,14 @@ public class WorkItemService : IWorkItemService, IDisposable
         return await client.QueryByWiqlAsync(wiql).ConfigureAwait(false);
     }
 
+    [MemberNotNull(nameof(workItemTrackingHttpClient))]
     private async Task<Result<ServiceState>> Login()
     {
+        var credential = new VssBasicCredential(string.Empty, azureDevopsWorkItemReadToken);
+        workItemTrackingHttpClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
         try
         {
-            var credential = new VssBasicCredential(string.Empty, azureDevopsWorkItemReadToken);
-            workItemTrackingHttpClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
             _ = await GetExistingWorkItemsIds(workItemTrackingHttpClient, new[] { 367 }); // Perform a simple call to check if the connection is valid
-
             state = ServiceState.Initialized;
             return Result.Ok(ServiceState.Initialized);
         }
@@ -147,6 +155,7 @@ public class WorkItemService : IWorkItemService, IDisposable
     }
 
     #region IDisposable
+    private bool disposedValue;
     protected virtual void Dispose(bool disposing)
     {
         if (!disposedValue)

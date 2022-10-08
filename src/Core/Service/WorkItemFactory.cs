@@ -1,15 +1,27 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.AzureDevOps.Connector.Service.Logic;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using TfWorkItem = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public static class WorkItemFactory
+public class WorkItemFactory
 {
-    public static WorkItem Create(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem, Uri azureDevopsOrgUri)
+    private readonly WorkItemTypeCache workItemTypeCache;
+    private readonly WorkItemStatusCache workItemStatusCache;
+
+    public WorkItemFactory(WorkItemTrackingHttpClient workItemTrackingHttpClient)
     {
-        var status = GetStatus(workItem);
+        workItemTypeCache = new WorkItemTypeCache(workItemTrackingHttpClient);
+        workItemStatusCache = new WorkItemStatusCache(workItemTrackingHttpClient);
+    }
+
+    public async Task<WorkItem> Create(TfWorkItem workItem, Uri azureDevopsOrgUri)
+    {
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
-        var workItemType = GetWorkItemKind(workItem);
+        var workItemType = await GetWorkItemType(workItem);
+        var status = await GetStatus(workItem, teamProject, workItemType.Name);
         var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
         return new WorkItem
         {
@@ -22,57 +34,37 @@ public static class WorkItemFactory
         };
     }
 
-    private static WorkItemStatus GetStatus(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
+    private async Task<WorkItemStatus> GetStatus(TfWorkItem workItem, string teamProject, string typeName)
     {
         if (workItem.Fields["System.State"] is string workItemStatusExpression)
         {
-            return workItemStatusExpression.ToLowerInvariant() switch
-            {
-                "new" => WorkItemStatus.New,
-                "approved" => WorkItemStatus.Approved,
-                "committed" => WorkItemStatus.Committed,
-                "done" => WorkItemStatus.Done,
-                "removed" => WorkItemStatus.Removed,
-                "in progress" => WorkItemStatus.InProgress,
-                "open" => WorkItemStatus.Open,
-                "closed" => WorkItemStatus.Closed,
-                "to do" => WorkItemStatus.ToDo,
-                _ => WorkItemStatus.Invalid
-            };
+            return await workItemStatusCache.Get(new(teamProject, typeName), workItemStatusExpression);
         }
         return WorkItemStatus.Invalid;
     }
 
-    private static string GetTeamProject(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
+    private static string GetTeamProject(TfWorkItem workItem)
     {
-        if (workItem.Fields["System.TeamProject"] is string title && !string.IsNullOrWhiteSpace(title))
-            return title;
+        if (workItem.Fields["System.TeamProject"] is string teamProject && !string.IsNullOrWhiteSpace(teamProject))
+            return teamProject;
         return "No team project";
     }
 
-    private static string GetTitle(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
+    private static string GetTitle(TfWorkItem workItem)
     {
         if (workItem.Fields["System.Title"] is string title && !string.IsNullOrWhiteSpace(title))
             return title;
         return "No title";
     }
 
-    private static WorkItemType GetWorkItemKind(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
+    private async Task<WorkItemType> GetWorkItemType(TfWorkItem workItem)
     {
-        if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression)
+        if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression
+            && workItem.Fields["System.TeamProject"] is string teamProject)
         {
-            return workItemTypeExpression.ToLowerInvariant() switch
-            {
-                "bug" => WorkItemType.Bug,
-                "epic" => WorkItemType.Epic,
-                "feature" => WorkItemType.Feature,
-                "impediment" => WorkItemType.Impediment,
-                "product backlog item" => WorkItemType.ProductBacklogItem,
-                "task" => WorkItemType.Task,
-                _ => WorkItemType.Unknown
-            };
+            return await workItemTypeCache.Get(new(teamProject), workItemTypeExpression);
         }
-        return WorkItemType.Unknown;
+        return WorkItemType.Invalid;
     }
 
     private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";

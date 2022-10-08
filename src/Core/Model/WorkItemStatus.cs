@@ -1,36 +1,18 @@
-﻿using System.Drawing;
+﻿namespace Develix.AzureDevOps.Connector.Model;
 
-namespace Develix.AzureDevOps.Connector.Model;
-
-public enum WorkItemStatus
+public class WorkItemStatus
 {
-    [Display("Invalid", "???", KnownColor.Magenta)]
-    Invalid = 0,
+    public WorkItemStatus(string name, string color, string category)
+    {
+        Name = name;
+        Color = color;
+        Category = category;
+    }
 
-    [Display("New", "New", KnownColor.Red)]
-    New,
+    public string Name { get; }
+    public string Color { get; set; }
+    public string Category { get; }
 
-    [Display("Approved", "App", KnownColor.Yellow)]
-    Approved,
-
-    [Display("Committed", "Com", KnownColor.Yellow)]
-    Committed,
-
-    [Display("Done", "Don", KnownColor.Green)]
-    Done,
-
-    [Display("Removed", "Del", KnownColor.Green)]
-    Removed,
-
-    [Display("In Progress", "Pro", KnownColor.Yellow)]
-    InProgress,
-
-    [Display("Open", "Ope", KnownColor.Yellow)]
-    Open,
-
-    [Display("Closed", "Clo", KnownColor.Green)]
-    Closed,
-
-    [Display("To do", "Tdo", KnownColor.Yellow)]
-    ToDo
+    public static WorkItemStatus Unknown { get; } = new("Unknown", "FF0000", "Unknown");
+    public static WorkItemStatus Invalid { get; } = new("Invalid", "FF0000", "Invalid");
 }

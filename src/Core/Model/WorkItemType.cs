@@ -1,30 +1,21 @@
-﻿using System.Drawing;
+﻿namespace Develix.AzureDevOps.Connector.Model;
 
-namespace Develix.AzureDevOps.Connector.Model;
-
-public enum WorkItemType
+public class WorkItemType
 {
-    [Display("Invalid", "Err", KnownColor.Magenta)]
-    Invalid = 0,
+    public WorkItemType(string name, string description, string color, string? iconUri)
+    {
+        Name = name;
+        Description = description;
+        Color = color;
+        if (Uri.TryCreate(iconUri, UriKind.Absolute, out var uri))
+            Icon = uri;
+    }
 
-    [Display("Bug", "Bug", KnownColor.Red)]
-    Bug,
+    public string Name { get; }
+    public string Description { get; }
+    public string Color { get; }
+    public Uri? Icon { get; }
 
-    [Display("Epic", "Epi", KnownColor.Orange)]
-    Epic,
-
-    [Display("Feature", "Fea", KnownColor.Lavender)]
-    Feature,
-
-    [Display("Impediment", "Imp", KnownColor.DarkMagenta)]
-    Impediment,
-
-    [Display("Product Backlog Item", "PBI", KnownColor.Cyan)]
-    ProductBacklogItem,
-
-    [Display("Task", "Tas", KnownColor.Yellow)]
-    Task,
-
-    [Display("Unknown", "???", KnownColor.Gray)]
-    Unknown,
+    public static WorkItemType Invalid { get; } = new("Invalid", "An invalid work item type", "FF0000", null);
+    public static WorkItemType Unknown { get; } = new("Unknown", "An unknown work item type", "808080", null);
 }
