@@ -2,14 +2,27 @@
 @using System.Diagnostics.CodeAnalysis
 
 <MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudStack Row=true>
+                @if (WorkItem.WorkItemType.Icon is Uri iconUri)
+                {
+                    <MudAvatar Color="Color.Info" Variant="Variant.Outlined" Style="padding:10px" Image="@(iconUri.ToString())" />
+                }
+                <MudStack Spacing="0">
+                    <MudText Typo="Typo.subtitle1" Style="font-weight:800; margin-bottom:-.4em">@WorkItem.Title</MudText>
+                    <MudText Typo="Typo.subtitle2" Style="@($"margin-top:0em; color: #{WorkItem.WorkItemType.Color}")">@WorkItem.WorkItemType.Name</MudText>
+                </MudStack>
+            </MudStack>
+        </CardHeaderContent>
+    </MudCardHeader>
     <MudCardContent>
-        <MudText Typo="Typo.subtitle2">@WorkItem.WorkItemType | @WorkItem.Title</MudText>
         <MudGrid>
             <MudItem xs="12" sm=4>
-                <MudText Typo="Typo.body2">ID: @WorkItem.Id</MudText>
+                <MudText Typo="Typo.body2"><div style="font-weight:800; display:inline">ID:</div> @WorkItem.Id</MudText>
             </MudItem>
             <MudItem xs="12" sm=4>
-                <MudText Typo="Typo.body2">Status: @WorkItem.Status</MudText>
+                <MudText Typo="Typo.body2"><div style="font-weight:800; display:inline">Status:</div> @WorkItem.Status</MudText>
             </MudItem>
         </MudGrid>
     </MudCardContent>

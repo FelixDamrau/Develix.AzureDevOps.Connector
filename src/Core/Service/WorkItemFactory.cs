@@ -1,15 +1,23 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public static class WorkItemFactory
+public class WorkItemFactory
 {
-    public static WorkItem Create(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem, Uri azureDevopsOrgUri)
+    private readonly WorkItemTypeCache workItemTypeCache;
+
+    public WorkItemFactory(WorkItemTrackingHttpClient workItemTrackingHttpClient)
+    {
+        workItemTypeCache = new WorkItemTypeCache(workItemTrackingHttpClient);
+    }
+
+    public async Task<WorkItem> Create(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem, Uri azureDevopsOrgUri)
     {
         var status = GetStatus(workItem);
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
-        var workItemType = GetWorkItemKind(workItem);
+        var workItemType = await GetWorkItemType(workItem);
         var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
         return new WorkItem
         {
@@ -45,8 +53,8 @@ public static class WorkItemFactory
 
     private static string GetTeamProject(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
     {
-        if (workItem.Fields["System.TeamProject"] is string title && !string.IsNullOrWhiteSpace(title))
-            return title;
+        if (workItem.Fields["System.TeamProject"] is string teamProject && !string.IsNullOrWhiteSpace(teamProject))
+            return teamProject;
         return "No team project";
     }
 
@@ -57,22 +65,14 @@ public static class WorkItemFactory
         return "No title";
     }
 
-    private static WorkItemType GetWorkItemKind(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
+    private async Task<WorkItemType> GetWorkItemType(Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem workItem)
     {
-        if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression)
+        if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression
+            && workItem.Fields["System.TeamProject"] is string teamProject)
         {
-            return workItemTypeExpression.ToLowerInvariant() switch
-            {
-                "bug" => WorkItemType.Bug,
-                "epic" => WorkItemType.Epic,
-                "feature" => WorkItemType.Feature,
-                "impediment" => WorkItemType.Impediment,
-                "product backlog item" => WorkItemType.ProductBacklogItem,
-                "task" => WorkItemType.Task,
-                _ => WorkItemType.Unknown
-            };
+            return await workItemTypeCache.GetWorkItemType(teamProject, workItemTypeExpression);
         }
-        return WorkItemType.Unknown;
+        return WorkItemType.Invalid;
     }
 
     private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
