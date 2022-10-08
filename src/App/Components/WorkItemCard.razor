@@ -7,7 +7,7 @@
             <MudStack Row=true>
                 @if (WorkItem.WorkItemType.Icon is Uri iconUri)
                 {
-                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined" Style="padding:10px" Image="@(iconUri.ToString())" />
+                    <MudAvatar Color="Color.Primary" Variant="Variant.Outlined" Style="padding:10px" Image="@(iconUri.AbsoluteUri)" />
                 }
                 <MudStack Spacing="0">
                     <MudText Typo="Typo.subtitle1" Style="font-weight:800; margin-bottom:-.4em">@WorkItem.Title</MudText>
