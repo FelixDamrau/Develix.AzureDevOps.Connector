@@ -1,10 +1,5 @@
 ﻿namespace Develix.AzureDevOps.Connector.Service.Logic;
 
-internal record WorkItemTypeCacheKey(string Project) : ICacheKey;
+internal record WorkItemTypeCacheKey(string Project);
 
-internal record WorkItemStatusCacheKey(string Project, string WorkItemType) : ICacheKey;
-
-internal interface ICacheKey
-{
-    string Project { get; }
-}
+internal record WorkItemStatusCacheKey(string Project, string WorkItemType);

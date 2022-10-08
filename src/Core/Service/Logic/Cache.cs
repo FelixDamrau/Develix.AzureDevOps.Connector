@@ -5,7 +5,7 @@ namespace Develix.AzureDevOps.Connector.Service.Logic;
 
 internal abstract class Cache<T, TKey>
     where T : class
-    where TKey : ICacheKey
+    where TKey : IEquatable<TKey>
 {
     protected readonly WorkItemTrackingHttpClient workItemTrackingHttpClient;
     private readonly T fallback;
@@ -38,7 +38,7 @@ internal abstract class Cache<T, TKey>
 
     protected class ItemCache
     {
-        private IReadOnlyDictionary<string, T> cache;
+        private readonly IReadOnlyDictionary<string, T> cache;
 
         public ItemCache(IReadOnlyDictionary<string, T> cache)
         {
