@@ -9,8 +9,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <Version>1.2.1</Version>
     <PackageId>Develix.AzureDevOps.Connector</PackageId>
-    <PackageVersion>1.2.0</PackageVersion>
+    <PackageVersion>$(Version)</PackageVersion>
     <Title>Develix AzureDevOps Connector</Title>
     <PackageDescription>Develix Azure DevOps Connector</PackageDescription>
     <Authors>Felix Damrau</Authors>
@@ -19,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Develix.Essentials" Version="1.0.0" />
+    <PackageReference Include="Develix.Essentials" Version="1.1.0" />
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.170.0" />
   </ItemGroup>
 

@@ -20,7 +20,7 @@ internal abstract class Cache<T, TKey>
 
     public async Task<T> Get(TKey cacheReference, string key)
     {
-        var itemCache = await GetItemCache(cacheReference);
+        var itemCache = await GetItemCache(cacheReference).ConfigureAwait(false);
         if (itemCache.TryGetValue(key, out var value))
             return value;
         return fallback;
@@ -29,7 +29,7 @@ internal abstract class Cache<T, TKey>
     private async Task<ItemCache> GetItemCache(TKey key)
     {
         if (!cache.ContainsKey(key))
-            cache[key] = await CreateItemCache(key);
+            cache[key] = await CreateItemCache(key).ConfigureAwait(false);
 
         return cache[key];
     }

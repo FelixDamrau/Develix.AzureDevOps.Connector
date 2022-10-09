@@ -16,7 +16,7 @@ public class Effects
     public async Task HandleGetPullRequestsAction(GetPullRequestsAction action, IDispatcher dispatcher)
     {
         var pullRequests = reposService.GetPullRequests(action.Ids);
-        var resultAction = new GetPullRequestsResultAction(await pullRequests.ToListAsync());
+        var resultAction = new GetPullRequestsResultAction(await pullRequests.ToListAsync().ConfigureAwait(false));
         dispatcher.Dispatch(resultAction);
     }
 }
