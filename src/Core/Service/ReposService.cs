@@ -12,20 +12,20 @@ public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposSer
 
         foreach (var id in ids)
         {
-            yield return await GetPullRequest(azureDevopsLogin.VssClient, id);
+            yield return await GetPullRequest(azureDevopsLogin.VssClient, id).ConfigureAwait(false);
         }
     }
 
     protected override async Task<GitClientLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken);
+        return await GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
     }
 
     private static async Task<Model.PullRequest> GetPullRequest(GitHttpClient prClient, int id)
     {
         try
         {
-            var pr = await prClient.GetPullRequestByIdAsync(id);
+            var pr = await prClient.GetPullRequestByIdAsync(id).ConfigureAwait(false);
             return PullRequestFactory.Create(pr);
         }
         catch (Exception)

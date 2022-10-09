@@ -12,7 +12,7 @@ public class PackagesService : VssService<PackageServiceHttpClient, PackageServi
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Package>>("Service was not initialized");
 
-        var result = await azureDevopsLogin.VssClient.GetAllPackages(project, feed);
+        var result = await azureDevopsLogin.VssClient.GetAllPackages(project, feed).ConfigureAwait(false);
         if (!result.Valid)
             return Result.Fail<IReadOnlyList<Package>>($"Could not get packages. Message: {result.Message}");
 
@@ -28,7 +28,7 @@ public class PackagesService : VssService<PackageServiceHttpClient, PackageServi
         if (!IsInitialized())
             return Result.Fail<Package>("Service was not initialized");
 
-        var result = await azureDevopsLogin.VssClient.GetPackage(project, feed, packageName);
+        var result = await azureDevopsLogin.VssClient.GetPackage(project, feed, packageName).ConfigureAwait(false);
         if (!result.Valid)
             return Result.Fail<Package>($"Could not get package. Message: {result.Message}");
 
@@ -37,7 +37,7 @@ public class PackagesService : VssService<PackageServiceHttpClient, PackageServi
 
     protected override async Task<PackageServiceLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await PackageServiceLogin.Create(baseUri, azureDevopsWorkItemReadToken);
+        return await PackageServiceLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
     }
 
     private static Package ToPackage(Value p)

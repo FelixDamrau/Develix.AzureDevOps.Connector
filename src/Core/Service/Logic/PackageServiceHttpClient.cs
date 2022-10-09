@@ -25,10 +25,10 @@ public class PackageServiceHttpClient
             Method = HttpMethod.Get,
         };
 
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadAsStringAsync();
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObject = JsonSerializer.Deserialize<ResponseObject>(result) ?? new();
             return Result.Ok(responseObject);
         }
@@ -40,7 +40,7 @@ public class PackageServiceHttpClient
 
     public async Task<Result<Value>> GetPackage(string project, string feed, string packageName)
     {
-        var packageIdResult = await GetPackageId(project, feed, packageName);
+        var packageIdResult = await GetPackageId(project, feed, packageName).ConfigureAwait(false);
         if (!packageIdResult.Valid)
             return Result.Fail<Value>(packageIdResult.Message);
 
@@ -50,10 +50,10 @@ public class PackageServiceHttpClient
             Method = HttpMethod.Get,
         };
 
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadAsStringAsync();
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObject = JsonSerializer.Deserialize<Value>(result) ?? new();
             return Result.Ok(responseObject);
         }
@@ -71,10 +71,10 @@ public class PackageServiceHttpClient
             Method = HttpMethod.Get,
         };
 
-        var response = await httpClient.SendAsync(request);
+        var response = await httpClient.SendAsync(request).ConfigureAwait(false);
         if (response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadAsStringAsync();
+            var result = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
             var responseObject = JsonSerializer.Deserialize<ResponseObject>(result);
 
             if (responseObject is null)
@@ -105,7 +105,7 @@ public class PackageServiceHttpClient
             RequestUri = new($"{baseUri}_apis/packaging/feeds?api-version=6.0-preview.1"),
             Method = HttpMethod.Get,
         };
-        var result = await httpClient.SendAsync(request);
+        var result = await httpClient.SendAsync(request).ConfigureAwait(false);
         result.EnsureSuccessStatusCode();
     }
 }

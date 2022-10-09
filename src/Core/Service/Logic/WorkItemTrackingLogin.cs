@@ -18,7 +18,7 @@ public class WorkItemTrackingLogin : AzureDevopsLogin<WorkItemTrackingHttpClient
     {
         var credential = new VssBasicCredential(string.Empty, token);
         var vssClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
-        await ConnectionCheck(vssClient);
+        await ConnectionCheck(vssClient).ConfigureAwait(false);
         var workItemFactory = new WorkItemFactory(vssClient);
         return new WorkItemTrackingLogin(azureDevopsOrgUri, vssClient, workItemFactory);
     }
@@ -26,6 +26,6 @@ public class WorkItemTrackingLogin : AzureDevopsLogin<WorkItemTrackingHttpClient
     private static async Task ConnectionCheck(WorkItemTrackingHttpClient client)
     {
         var wiql = new Wiql() { Query = "Select [Id] From WorkItems Where [Id] = 367" };
-        await client.QueryByWiqlAsync(wiql);
+        await client.QueryByWiqlAsync(wiql).ConfigureAwait(false);
     }
 }

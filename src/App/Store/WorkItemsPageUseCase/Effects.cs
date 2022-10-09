@@ -16,7 +16,7 @@ public class Effects
     [EffectMethod]
     public async Task HandleGetPullRequestsAction(GetWorkItemsAction action, IDispatcher dispatcher)
     {
-        var workItemResult = await workItemService.GetWorkItems(action.Ids, false);
+        var workItemResult = await workItemService.GetWorkItems(action.Ids, false).ConfigureAwait(false);
         var workItems = workItemResult.Valid ? workItemResult.Value : Array.Empty<WorkItem>(); // TODO Error handling!
         var resultAction = new GetWorkItemsResultAction(workItems);
         dispatcher.Dispatch(resultAction);

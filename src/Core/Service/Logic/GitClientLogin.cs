@@ -13,12 +13,12 @@ public class GitClientLogin : AzureDevopsLogin<GitHttpClient>
     {
         var credential = new VssBasicCredential(string.Empty, token);
         var vssClient = new GitHttpClient(azureDevopsOrgUri, credential);
-        await ConnectionCheck(vssClient);
+        await ConnectionCheck(vssClient).ConfigureAwait(false);
         return new GitClientLogin(azureDevopsOrgUri, vssClient);
     }
 
     private static async Task ConnectionCheck(GitHttpClient client)
     {
-        await client.GetRepositoriesAsync();
+        await client.GetRepositoriesAsync().ConfigureAwait(false);
     }
 }

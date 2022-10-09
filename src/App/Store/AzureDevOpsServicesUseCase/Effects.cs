@@ -20,7 +20,7 @@ public class Effects
     public async Task HandleLoginRepoServiceAction(LoginRepoServiceAction action, IDispatcher dispatcher)
     {
         var uri = GetUriWithTrailingSlash(action.AzureDevopsOrgUri);
-        var login = await ReposService.Initialize(uri, action.Token);
+        var login = await ReposService.Initialize(uri, action.Token).ConfigureAwait(false);
         var resultAction = new LoginRepoServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
     }
@@ -29,7 +29,7 @@ public class Effects
     public async Task HandleLoginWorkItemServiceAction(LoginWorkItemServiceAction action, IDispatcher dispatcher)
     {
         var uri = GetUriWithTrailingSlash(action.AzureDevopsOrgUri);
-        var login = await WorkItemService.Initialize(uri, action.Token);
+        var login = await WorkItemService.Initialize(uri, action.Token).ConfigureAwait(false);
         var resultAction = new LoginWorkItemServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
     }
@@ -38,7 +38,7 @@ public class Effects
     public async Task HandleLoginPackagesServiceAction(LoginPackagesServiceAction action, IDispatcher dispatcher)
     {
         var uri = GetUriWithTrailingSlash(action.AzureDevopsOrgUri);
-        var login = await PackagesService.Initialize(uri, action.Token);
+        var login = await PackagesService.Initialize(uri, action.Token).ConfigureAwait(false);
         var resultAction = new LoginPackagesServiceResultAction(login.Valid ? Model.ConnectionStatus.Connected : Model.ConnectionStatus.NotConnected);
         dispatcher.Dispatch(resultAction);
     }

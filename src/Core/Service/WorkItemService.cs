@@ -19,12 +19,12 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
     {
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
-        return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests));
+        return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests)).ConfigureAwait(false);
     }
 
     protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken);
+        return await WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
     }
 
     private async Task<IReadOnlyList<Model.WorkItem>> GetWorkItemsInternal(IEnumerable<int> ids, bool includePullRequests)
@@ -34,16 +34,16 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         if (!ids.Any())
             return Array.Empty<Model.WorkItem>();
 
-        var queryResult = await RunQueryAsync(azureDevopsLogin.VssClient, ids);
+        var queryResult = await RunQueryAsync(azureDevopsLogin.VssClient, ids).ConfigureAwait(false);
         var workItems = queryResult.Select(tfWi => Create(tfWi, azureDevopsLogin.AzureDevopsOrgUri, includePullRequests, azureDevopsLogin.WorkItemFactory));
-        return await Task.WhenAll(workItems);
+        return await Task.WhenAll(workItems).ConfigureAwait(false);
     }
 
     private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)
     {
-        var workItem = await workItemFactory.Create(azureDevopsWorkItem, baseOrgUri);
+        var workItem = await workItemFactory.Create(azureDevopsWorkItem, baseOrgUri).ConfigureAwait(false);
         if (includePullRequests)
-            await AddPullRequests(azureDevopsWorkItem, workItem);
+            await AddPullRequests(azureDevopsWorkItem, workItem).ConfigureAwait(false);
         return workItem;
     }
 
@@ -64,7 +64,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
 
     private static async Task<IReadOnlyList<WorkItem>> RunQueryAsync(WorkItemTrackingHttpClient client, IEnumerable<int> ids)
     {
-        var result = await GetExistingWorkItemsIds(client, ids);
+        var result = await GetExistingWorkItemsIds(client, ids).ConfigureAwait(false);
         var existingIds = result.WorkItems.Select(wi => wi.Id).ToList();
         if (existingIds.Count == 0)
             return Array.Empty<WorkItem>();

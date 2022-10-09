@@ -19,8 +19,8 @@ public class WorkItemFactory
     {
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
-        var workItemType = await GetWorkItemType(workItem);
-        var status = await GetStatus(workItem, teamProject, workItemType.Name);
+        var workItemType = await GetWorkItemType(workItem).ConfigureAwait(false);
+        var status = await GetStatus(workItem, teamProject, workItemType.Name).ConfigureAwait(false);
         var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
         return new WorkItem
         {
@@ -37,7 +37,7 @@ public class WorkItemFactory
     {
         if (workItem.Fields["System.State"] is string workItemStatusExpression)
         {
-            return await workItemStatusCache.Get(new(teamProject, typeName), workItemStatusExpression);
+            return await workItemStatusCache.Get(new(teamProject, typeName), workItemStatusExpression).ConfigureAwait(false);
         }
         return WorkItemStatus.Invalid;
     }
@@ -61,7 +61,7 @@ public class WorkItemFactory
         if (workItem.Fields["System.WorkItemType"] is string workItemTypeExpression
             && workItem.Fields["System.TeamProject"] is string teamProject)
         {
-            return await workItemTypeCache.Get(new(teamProject), workItemTypeExpression);
+            return await workItemTypeCache.Get(new(teamProject), workItemTypeExpression).ConfigureAwait(false);
         }
         return WorkItemType.Invalid;
     }

@@ -15,7 +15,7 @@ public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService
     public virtual async Task<Result> Initialize(Uri azureDevopsOrgUri, string azureDevopsWorkItemReadToken)
     {
         azureDevopsLogin = null;
-        var result = await Wrap(async () => await CreateLogin(azureDevopsOrgUri, azureDevopsWorkItemReadToken));
+        var result = await Wrap(async () => await CreateLogin(azureDevopsOrgUri, azureDevopsWorkItemReadToken).ConfigureAwait(false)).ConfigureAwait(false);
         if (result.Valid)
         {
             azureDevopsLogin = result.Value;
@@ -39,7 +39,7 @@ public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService
     protected async Task<Result> Wrap(Action action)
     {
         var function = () => { action(); return Task.FromResult(true); };
-        var result = await Wrap(() => function());
+        var result = await Wrap(() => function()).ConfigureAwait(false);
         return result.Valid
             ? Result.Ok()
             : Result.Fail(result.Message);
@@ -49,7 +49,7 @@ public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService
     {
         try
         {
-            var response = await function.Invoke();
+            var response = await function.Invoke().ConfigureAwait(false);
             return Result.Ok(response);
         }
         catch (VssUnauthorizedException e)

@@ -12,7 +12,7 @@ internal class WorkItemTypeCache : Cache<WorkItemType, WorkItemTypeCacheKey>
 
     protected override async Task<ItemCache> CreateItemCache(WorkItemTypeCacheKey key)
     {
-        var workItemTypes = await workItemTrackingHttpClient.GetWorkItemTypesAsync(key.Project);
+        var workItemTypes = await workItemTrackingHttpClient.GetWorkItemTypesAsync(key.Project).ConfigureAwait(false);
         var workItemTypesDictionary = workItemTypes
             .Select(tfWi => new WorkItemType(tfWi.Name, tfWi.Description, tfWi.Color, tfWi.Icon.Url))
             .ToDictionary(wi => wi.Name);
