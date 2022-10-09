@@ -22,7 +22,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests));
     }
 
-    protected async override Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
+    protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
         return await WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken);
     }
