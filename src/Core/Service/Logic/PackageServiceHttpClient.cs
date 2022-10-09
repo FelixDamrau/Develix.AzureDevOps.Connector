@@ -2,7 +2,7 @@
 using Develix.AzureDevOps.Connector.Model.PackageServiceModel;
 using Develix.Essentials.Core;
 
-namespace Develix.AzureDevOps.Connector.Service;
+namespace Develix.AzureDevOps.Connector.Service.Logic;
 
 public class PackageServiceHttpClient
 {

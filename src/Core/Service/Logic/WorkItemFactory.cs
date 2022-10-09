@@ -1,9 +1,8 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
-using Develix.AzureDevOps.Connector.Service.Logic;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using TfWorkItem = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.WorkItem;
 
-namespace Develix.AzureDevOps.Connector.Service;
+namespace Develix.AzureDevOps.Connector.Service.Logic;
 
 public class WorkItemFactory
 {
