@@ -10,7 +10,7 @@
 
   <PropertyGroup>
     <PackageId>Develix.AzureDevOps.Connector</PackageId>
-    <PackageVersion>1.2.0</PackageVersion>
+    <PackageVersion>1.2.1</PackageVersion>
     <Title>Develix AzureDevOps Connector</Title>
     <PackageDescription>Develix Azure DevOps Connector</PackageDescription>
     <Authors>Felix Damrau</Authors>
