@@ -5,7 +5,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTrackingLogin>, IWorkItemService, IDisposable
+public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTrackingLogin>, IWorkItemService
 {
     private readonly IReposService reposService;
 
@@ -88,26 +88,4 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         };
         return await client.QueryByWiqlAsync(wiql).ConfigureAwait(false);
     }
-
-    #region IDisposable
-    private bool disposedValue;
-    protected virtual void Dispose(bool disposing)
-    {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                azureDevopsLogin?.VssClient.Dispose();
-            }
-            disposedValue = true;
-        }
-    }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-    #endregion
 }

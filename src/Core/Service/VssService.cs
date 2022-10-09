@@ -6,8 +6,8 @@ using Microsoft.VisualStudio.Services.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService
-    where TVssClient : class
+public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService, IDisposable
+    where TVssClient : class, IDisposable
     where TLogin : AzureDevopsLogin<TVssClient>
 {
     protected TLogin? azureDevopsLogin;
@@ -65,4 +65,25 @@ public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService
             return Result.Fail<T>("Unknown error!" + Environment.NewLine + "Error message: " + e.Message);
         }
     }
+
+    #region IDisposable
+    private bool disposedValue;
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                azureDevopsLogin?.VssClient?.Dispose();
+            }
+            disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }

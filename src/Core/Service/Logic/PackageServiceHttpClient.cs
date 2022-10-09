@@ -4,7 +4,7 @@ using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service.Logic;
 
-public class PackageServiceHttpClient
+public class PackageServiceHttpClient : IDisposable
 {
     private readonly string baseUri;
     private readonly HttpClient httpClient;
@@ -12,7 +12,7 @@ public class PackageServiceHttpClient
     public PackageServiceHttpClient(string baseUri, string token)
     {
         this.baseUri = baseUri;
-        httpClient = new HttpClient();
+        httpClient = HttpClientFactory.Create();
         var base64EncodedToken = Convert.ToBase64String(System.Text.Encoding.ASCII.GetBytes($"token:{token}"));
         httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {base64EncodedToken}");
     }
@@ -108,4 +108,25 @@ public class PackageServiceHttpClient
         var result = await httpClient.SendAsync(request).ConfigureAwait(false);
         result.EnsureSuccessStatusCode();
     }
+
+    #region IDisposable
+    private bool disposedValue;
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
+        {
+            if (disposing)
+            {
+                httpClient.Dispose();
+            }
+            disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    #endregion
 }
