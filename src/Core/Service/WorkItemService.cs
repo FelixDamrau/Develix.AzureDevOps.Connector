@@ -12,7 +12,6 @@ public class WorkItemService : IWorkItemService, IDisposable
     private readonly IReposService reposService;
 
     private Uri? azureDevopsOrgUri;
-    private string? azureDevopsWorkItemReadToken;
     private ServiceState state;
     private WorkItemFactory? workItemFactory;
     private WorkItemTrackingHttpClient? workItemTrackingHttpClient;
@@ -27,31 +26,21 @@ public class WorkItemService : IWorkItemService, IDisposable
     {
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
-
-        if (!ids.Any())
-            return Result.Ok<IReadOnlyList<Model.WorkItem>>(Array.Empty<Model.WorkItem>());
-
-        var queryResults = await RunQueryAsync(workItemTrackingHttpClient, ids);
-        if (!queryResults.Valid)
-            return Result.Fail<IReadOnlyList<Model.WorkItem>>(queryResults.Message);
-
-        var workItems = new List<Model.WorkItem>();
-        foreach (var azureDevopsWorkItem in queryResults.Value)
-        {
-            var workItem = await Create(azureDevopsWorkItem, azureDevopsOrgUri, includePullRequests, workItemFactory);
-            workItems.Add(workItem);
-        }
-        return Result.Ok<IReadOnlyList<Model.WorkItem>>(workItems);
+        return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests));
     }
 
     /// <inheritdoc/>
     public async Task<Result> Initialize(Uri azureDevopsOrgUri, string azureDevopsWorkItemReadToken)
     {
-        this.azureDevopsOrgUri = azureDevopsOrgUri;
-        this.azureDevopsWorkItemReadToken = azureDevopsWorkItemReadToken;
-        var serviceState = await Login();
-        workItemFactory = new WorkItemFactory(workItemTrackingHttpClient);
-        return serviceState.Valid ? Result.Ok() : Result.Fail(serviceState.Message);
+        state = ServiceState.NotInitialized;
+        var result = await Wrap(() => InitializeInternal(azureDevopsOrgUri, azureDevopsWorkItemReadToken));
+        if (result.Valid)
+        {
+            state = ServiceState.Initialized;
+            return Result.Ok();
+        }
+        state = ServiceState.InitializationFailed;
+        return Result.Fail(result.Message);
     }
 
     /// <inheritdoc/>
@@ -62,6 +51,37 @@ public class WorkItemService : IWorkItemService, IDisposable
             && workItemTrackingHttpClient is not null
             && azureDevopsOrgUri is not null
             && workItemFactory is not null;
+    }
+
+    private async Task<IReadOnlyList<Model.WorkItem>> GetWorkItemsInternal(IEnumerable<int> ids, bool includePullRequests)
+    {
+        IsInitializedGuard();
+
+        if (!ids.Any())
+            return Array.Empty<Model.WorkItem>();
+
+        var queryResult = await RunQueryAsync(workItemTrackingHttpClient, ids);
+        var workItems = queryResult.Select(tfWi => Create(tfWi, azureDevopsOrgUri, includePullRequests, workItemFactory));
+        return await Task.WhenAll(workItems);
+    }
+
+    private async Task<bool> InitializeInternal(Uri azureDevopsOrgUri, string azureDevopsWorkItemReadToken)
+    {
+        this.azureDevopsOrgUri = azureDevopsOrgUri;
+        var credential = new VssBasicCredential(string.Empty, azureDevopsWorkItemReadToken);
+        workItemTrackingHttpClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
+
+        // Perform a simple call to check if the connection is valid
+        _ = await GetExistingWorkItemsIds(workItemTrackingHttpClient, new[] { 367 });
+        workItemFactory = new WorkItemFactory(workItemTrackingHttpClient);
+        return true;
+    }
+
+    [MemberNotNull(nameof(workItemTrackingHttpClient), nameof(azureDevopsOrgUri), nameof(workItemFactory))]
+    private void IsInitializedGuard()
+    {
+        if (!IsInitialized())
+            throw new InvalidOperationException($"The services are not initialzed!");
     }
 
     private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)
@@ -87,27 +107,18 @@ public class WorkItemService : IWorkItemService, IDisposable
         }
     }
 
-    private static async Task<Result<IReadOnlyList<WorkItem>>> RunQueryAsync(WorkItemTrackingHttpClient client, IEnumerable<int> ids)
+    private static async Task<IReadOnlyList<WorkItem>> RunQueryAsync(WorkItemTrackingHttpClient client, IEnumerable<int> ids)
     {
-        try
-        {
-            var result = await GetExistingWorkItemsIds(client, ids);
-            var existingIds = result.WorkItems.Select(wi => wi.Id).ToList();
-            if (existingIds.Count == 0)
-                return Result.Ok<IReadOnlyList<WorkItem>>(Array.Empty<WorkItem>());
+        var result = await GetExistingWorkItemsIds(client, ids);
+        var existingIds = result.WorkItems.Select(wi => wi.Id).ToList();
+        if (existingIds.Count == 0)
+            return Array.Empty<WorkItem>();
 
-            var workItems = await client.GetWorkItemsAsync(
-                ids: existingIds,
-                asOf: result.AsOf,
-                expand: WorkItemExpand.Relations)
-                .ConfigureAwait(false);
-
-            return Result.Ok<IReadOnlyList<WorkItem>>(workItems);
-        }
-        catch (Exception e)
-        {
-            return Result.Fail<IReadOnlyList<WorkItem>>(e.Message);
-        }
+        return await client.GetWorkItemsAsync(
+            ids: existingIds,
+            asOf: result.AsOf,
+            expand: WorkItemExpand.Relations)
+            .ConfigureAwait(false);
     }
 
     private static async Task<WorkItemQueryResult> GetExistingWorkItemsIds(WorkItemTrackingHttpClient client, IEnumerable<int> ids)
@@ -123,34 +134,24 @@ public class WorkItemService : IWorkItemService, IDisposable
         return await client.QueryByWiqlAsync(wiql).ConfigureAwait(false);
     }
 
-    [MemberNotNull(nameof(workItemTrackingHttpClient))]
-    private async Task<Result<ServiceState>> Login()
+    private async Task<Result<T>> Wrap<T>(Func<Task<T>> action)
     {
-        var credential = new VssBasicCredential(string.Empty, azureDevopsWorkItemReadToken);
-        workItemTrackingHttpClient = new WorkItemTrackingHttpClient(azureDevopsOrgUri, credential);
         try
         {
-            _ = await GetExistingWorkItemsIds(workItemTrackingHttpClient, new[] { 367 }); // Perform a simple call to check if the connection is valid
-            state = ServiceState.Initialized;
-            return Result.Ok(ServiceState.Initialized);
+            var response = await action.Invoke();
+            return Result.Ok(response);
         }
         catch (VssUnauthorizedException e)
         {
-            return Error("Authorization failed!" + Environment.NewLine + "Error message: " + e.Message);
+            return Result.Fail<T>("Authorization failed!" + Environment.NewLine + "Error message: " + e.Message);
         }
         catch (VssServiceResponseException e)
         {
-            return Error("Connection failed!" + Environment.NewLine + "Error message: " + e.Message);
+            return Result.Fail<T>("Connection failed!" + Environment.NewLine + "Error message: " + e.Message);
         }
         catch (Exception e)
         {
-            return Error("Unknown error!" + Environment.NewLine + "Error message: " + e.Message);
-        }
-
-        Result<ServiceState> Error(string message)
-        {
-            state = ServiceState.InitializationFailed;
-            return Result.Fail<ServiceState>(message);
+            return Result.Fail<T>("Unknown error!" + Environment.NewLine + "Error message: " + e.Message);
         }
     }
 
