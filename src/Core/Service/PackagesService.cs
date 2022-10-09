@@ -1,21 +1,18 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using Develix.AzureDevOps.Connector.Model;
+﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.AzureDevOps.Connector.Model.PackageServiceModel;
+using Develix.AzureDevOps.Connector.Service.Logic;
 using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
-public partial class PackagesService : IPackagesService
+public class PackagesService : VssService<PackageServiceHttpClient, PackageServiceLogin>, IPackagesService
 {
-    private ServiceState state = ServiceState.NotInitialized;
-    private PackageServiceHttpClient? packageServiceHttpClient;
-
     public async Task<Result<IReadOnlyList<Package>>> GetPackages(string project, string feed)
     {
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Package>>("Service was not initialized");
 
-        var result = await packageServiceHttpClient.GetAllPackages(project, feed);
+        var result = await azureDevopsLogin.VssClient.GetAllPackages(project, feed);
         if (!result.Valid)
             return Result.Fail<IReadOnlyList<Package>>($"Could not get packages. Message: {result.Message}");
 
@@ -31,24 +28,17 @@ public partial class PackagesService : IPackagesService
         if (!IsInitialized())
             return Result.Fail<Package>("Service was not initialized");
 
-        var result = await packageServiceHttpClient.GetPackage(project, feed, packageName);
+        var result = await azureDevopsLogin.VssClient.GetPackage(project, feed, packageName);
         if (!result.Valid)
             return Result.Fail<Package>($"Could not get package. Message: {result.Message}");
 
         return Result.Ok(ToPackage(result.Value));
     }
 
-    public async Task<Result> Initialize(Uri azureDevopsOrgUri, string token)
+    protected override async Task<PackageServiceLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        packageServiceHttpClient = new PackageServiceHttpClient(azureDevopsOrgUri.AbsoluteUri, token);
-        var result = await packageServiceHttpClient.IsInitialized();
-        state = result.Valid ? ServiceState.Initialized : ServiceState.InitializationFailed;
-
-        return result;
+        return await PackageServiceLogin.Create(baseUri, azureDevopsWorkItemReadToken);
     }
-
-    [MemberNotNullWhen(true, nameof(packageServiceHttpClient))]
-    public bool IsInitialized() => state == ServiceState.Initialized && packageServiceHttpClient is not null;
 
     private static Package ToPackage(Value p)
     {
