@@ -1,6 +1,6 @@
 ﻿namespace Develix.AzureDevOps.Connector.Service;
 
-internal enum ServiceState
+public enum ServiceState
 {
     Invalid = 0,
     NotInitialized,
