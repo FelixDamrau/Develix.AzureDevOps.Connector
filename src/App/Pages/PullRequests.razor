@@ -7,7 +7,10 @@
 @using Develix.AzureDevOps.Connector.Service
 @using System.Diagnostics.CodeAnalysis
 
+<PageTitle>Pull Requests</PageTitle>
+
 <MudPaper Elevation="2" Class="pa-4 ma-3">
+    <MudText Typo="Typo.h4">Pull Requests</MudText>
     <MudGrid>
         <MudItem xs="12" sm="7" lg="9">
             <AzureDevOpsServiceLogin LoginServiceActionFactory="(u, t) => new LoginRepoServiceAction(u,t)" />
