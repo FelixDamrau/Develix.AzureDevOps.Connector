@@ -6,7 +6,7 @@ public class WorkItemType
     {
         Name = name;
         Description = description;
-        Color = new AzdoColor(color);
+        Color = new(color);
         if (Uri.TryCreate(iconUri, UriKind.Absolute, out var uri))
             Icon = uri;
     }
