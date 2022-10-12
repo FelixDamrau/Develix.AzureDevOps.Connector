@@ -10,7 +10,7 @@ public class WorkItemStatus
     }
 
     public string Name { get; }
-    public AzdoColor Color { get; set; }
+    public AzdoColor Color { get; }
     public string Category { get; }
 
     public static WorkItemStatus Unknown { get; } = new("Unknown", "FF0000", "Unknown");
