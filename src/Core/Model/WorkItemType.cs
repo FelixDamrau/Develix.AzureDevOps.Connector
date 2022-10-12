@@ -6,14 +6,14 @@ public class WorkItemType
     {
         Name = name;
         Description = description;
-        Color = color;
+        Color = new(color);
         if (Uri.TryCreate(iconUri, UriKind.Absolute, out var uri))
             Icon = uri;
     }
 
     public string Name { get; }
     public string Description { get; }
-    public string Color { get; }
+    public AzdoColor Color { get; }
     public Uri? Icon { get; }
 
     public static WorkItemType Invalid { get; } = new("Invalid", "An invalid work item type", "FF0000", null);
