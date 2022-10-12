@@ -11,7 +11,7 @@
                 }
                 <MudStack Spacing="0">
                     <MudText Typo="Typo.subtitle1" Style="font-weight:800; margin-bottom:-.4em">@WorkItem.Title</MudText>
-                    <MudText Typo="Typo.subtitle2" Style="@($"margin-top:0em; color: #{WorkItem.WorkItemType.Color}")">@WorkItem.WorkItemType.Name</MudText>
+                    <MudText Typo="Typo.subtitle2" Style="@($"margin-top:0em; color: #{WorkItem.WorkItemType.Color.Rgb}")">@WorkItem.WorkItemType.Name</MudText>
                 </MudStack>
             </MudStack>
         </CardHeaderContent>
