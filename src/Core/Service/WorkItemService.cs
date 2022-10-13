@@ -54,10 +54,11 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         {
             var prIds = prRelations.Select(prr => PullRequestFactory.GetPullRequestId(prr)).Where(r => r.Valid).Select(r => r.Value);
 
-            var gitPrs = reposService.GetPullRequests(prIds);
-            await foreach (var pr in gitPrs)
+            var pullRequestResults = reposService.GetPullRequests(prIds);
+            await foreach (var result in pullRequestResults)
             {
-                workItem.AddPullRequest(pr);
+                if (result.Valid)
+                    workItem.AddPullRequest(result.Value);
             }
         }
     }

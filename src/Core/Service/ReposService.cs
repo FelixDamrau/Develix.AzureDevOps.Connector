@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Service.Logic;
+using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
@@ -6,7 +7,7 @@ namespace Develix.AzureDevOps.Connector.Service;
 public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposService
 {
     /// <inheritdoc/>
-    public async IAsyncEnumerable<Model.PullRequest> GetPullRequests(IEnumerable<int> ids)
+    public async IAsyncEnumerable<Result<Model.PullRequest>> GetPullRequests(IEnumerable<int> ids)
     {
         IsInitializedGuard();
 
@@ -21,16 +22,16 @@ public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposSer
         return await GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
     }
 
-    private static async Task<Model.PullRequest> GetPullRequest(GitHttpClient prClient, int id)
+    private static async Task<Result<Model.PullRequest>> GetPullRequest(GitHttpClient prClient, int id)
     {
         try
         {
             var pr = await prClient.GetPullRequestByIdAsync(id).ConfigureAwait(false);
-            return PullRequestFactory.Create(pr);
+            return Result.Ok(PullRequestFactory.Create(pr));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return PullRequestFactory.GetDefaultInvalid() with { Id = id, Status = Model.PullRequestStatus.Invalid };
+            return Result.Fail<Model.PullRequest>($"Could not create pull request with id {id} - Message: {ex.Message}");
         }
     }
 }

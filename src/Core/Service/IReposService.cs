@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Model;
+using Develix.Essentials.Core;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
@@ -11,5 +12,5 @@ public interface IReposService : IAzureDevOpsService
     /// Gets all pull requests with the given <paramref name="ids"/>.
     /// </summary>
     /// <param name="ids">The IDs of the pull requests that should be fetched.</param>
-    IAsyncEnumerable<PullRequest> GetPullRequests(IEnumerable<int> ids);
+    IAsyncEnumerable<Result<PullRequest>> GetPullRequests(IEnumerable<int> ids);
 }
