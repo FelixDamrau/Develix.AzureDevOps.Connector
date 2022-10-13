@@ -16,7 +16,7 @@ public class AzdoColor
         return colorString switch
         {
             { Length: 6 } => colorString,
-            { Length: 8 } => colorString[0..6],
+            { Length: 8 } => colorString[2..],
             _ => "FF0000",
         };
     }

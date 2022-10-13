@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.2.2</Version>
+    <Version>$(PackageVersion)</Version>
     <PackageId>Develix.AzureDevOps.Connector</PackageId>
-    <PackageVersion>$(Version)</PackageVersion>
+    <PackageVersion>1.2.3</PackageVersion>
     <Title>Develix AzureDevOps Connector</Title>
     <PackageDescription>Develix Azure DevOps Connector</PackageDescription>
     <Authors>Felix Damrau</Authors>
