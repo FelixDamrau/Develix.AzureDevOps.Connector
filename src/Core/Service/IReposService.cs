@@ -12,5 +12,5 @@ public interface IReposService : IAzureDevOpsService
     /// Gets all pull requests with the given <paramref name="ids"/>.
     /// </summary>
     /// <param name="ids">The IDs of the pull requests that should be fetched.</param>
-    IAsyncEnumerable<Result<PullRequest>> GetPullRequests(IEnumerable<int> ids);
+    Task<Result<IReadOnlyList<PullRequest>>> GetPullRequests(IEnumerable<int> ids);
 }

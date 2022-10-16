@@ -7,14 +7,15 @@ namespace Develix.AzureDevOps.Connector.Service;
 public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposService
 {
     /// <inheritdoc/>
-    public async IAsyncEnumerable<Result<Model.PullRequest>> GetPullRequests(IEnumerable<int> ids)
+    public async Task<Result<IReadOnlyList<Model.PullRequest>>> GetPullRequests(IEnumerable<int> ids)
     {
-        IsInitializedGuard();
+        if (!IsInitialized())
+            return Result.Fail<IReadOnlyList<Model.PullRequest>>("Service is not initialized.");
 
-        foreach (var id in ids)
-        {
-            yield return await GetPullRequest(azureDevopsLogin.VssClient, id).ConfigureAwait(false);
-        }
+        var requests = ids.Select(id => GetPullRequest(azureDevopsLogin.VssClient, id));
+        var results = await Task.WhenAll(requests).ConfigureAwait(false);
+        IReadOnlyList<Model.PullRequest> pullRequests = results.Where(x => x.Valid).Select(x => x.Value).ToList();
+        return Result.Ok(pullRequests);
     }
 
     protected override async Task<GitClientLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
