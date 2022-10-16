@@ -38,12 +38,6 @@
         <MudItem xs="4" md="3">
             <MudTextField @bind-Value="packageName" Label="Package Name" />
         </MudItem>
-        @if (pageState.Value.ErrorMessage is not null)
-        {
-            <MudItem xs="12">
-                <MudAlert Severity="Severity.Error">@pageState.Value.ErrorMessage</MudAlert>
-            </MudItem>
-        }
         <PackageCardView Packages="pageState.Value.Packages" />
     </MudGrid>
 </MudPaper>

@@ -1,4 +1,5 @@
-﻿using Develix.AzureDevOps.Connector.Model;
+﻿using Develix.AzureDevOps.Connector.App.Services;
+using Develix.AzureDevOps.Connector.Model;
 using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 
@@ -6,41 +7,34 @@ namespace Develix.AzureDevOps.Connector.App.Store.PackagesPageUseCase;
 public class Effects
 {
     private readonly IPackagesService packagesService;
+    private readonly ISnackbarService snackbarService;
 
-    public Effects(IPackagesService packagesService)
+    public Effects(IPackagesService packagesService, ISnackbarService snackbarService)
     {
         this.packagesService = packagesService;
+        this.snackbarService = snackbarService;
     }
 
     [EffectMethod]
     public async Task HandleGetAllPackagesAction(GetAllPackagesAction action, IDispatcher dispatcher)
     {
         var packagesResult = await packagesService.GetPackages(action.Project, action.Feed).ConfigureAwait(false);
-        if (packagesResult.Valid)
-        {
-            var resultAction = new GetAllPackagesResultAction(packagesResult.Value);
-            dispatcher.Dispatch(resultAction);
-        }
-        else
-        {
-            var resultAction = new GetAllPackagesResultAction(Array.Empty<Package>(), packagesResult.Message); // TODO Error handling!
-            dispatcher.Dispatch(resultAction);
-        }
+        var packages = packagesResult.Valid ? packagesResult.Value : Array.Empty<Package>();
+
+        var resultAction = new GetPackagesResultAction(packages);
+        dispatcher.Dispatch(resultAction);
+        if (!packagesResult.Valid)
+            snackbarService.SendError($"Could not get packages! Message: {packagesResult.Message}");
     }
 
     [EffectMethod]
     public async Task HandleGetPackageAction(GetPackageAction action, IDispatcher dispatcher)
     {
         var packageResult = await packagesService.GetPackage(action.Project, action.Feed, action.PackageName).ConfigureAwait(false);
-        if (packageResult.Valid)
-        {
-            var resultAction = new GetPackageResultAction(packageResult.Value);
-            dispatcher.Dispatch(resultAction);
-        }
-        else
-        {
-            var resultAction = new GetPackageResultAction(null, packageResult.Message); // TODO Error handling!
-            dispatcher.Dispatch(resultAction);
-        }
+        var packages = packageResult.Valid ? new[] { packageResult.Value } : Array.Empty<Package>();
+        var resultAction = new GetPackagesResultAction(packages);
+        dispatcher.Dispatch(resultAction);
+        if (!packageResult.Valid)
+            snackbarService.SendError($"Could not get package! Message: {packageResult.Message}");
     }
 }

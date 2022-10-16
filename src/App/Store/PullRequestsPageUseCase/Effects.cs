@@ -1,30 +1,45 @@
-﻿using Develix.AzureDevOps.Connector.Service;
+﻿using Develix.AzureDevOps.Connector.App.Services;
+using Develix.AzureDevOps.Connector.Model;
+using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
-using MudBlazor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.PullRequestsPageUseCase;
 
 public class Effects
 {
     private readonly IReposService reposService;
-    private readonly ISnackbar snackbar;
+    private readonly ISnackbarService snackbarService;
 
-    public Effects(IReposService reposService, ISnackbar snackbar)
+    public Effects(IReposService reposService, ISnackbarService snackbarService)
     {
         this.reposService = reposService;
-        this.snackbar = snackbar;
+        this.snackbarService = snackbarService;
     }
 
     [EffectMethod]
     public async Task HandleGetPullRequestsAction(GetPullRequestsAction action, IDispatcher dispatcher)
     {
-        var pullRequests = reposService.GetPullRequests(action.Ids);
-        var results = await pullRequests.ToListAsync().ConfigureAwait(false);
-        var resultAction = new GetPullRequestsResultAction(results.Where(r => r.Valid).Select(r => r.Value).ToList());
-        foreach (var message in results.Where(r => !r.Valid).Select(r => r.Message))
+        var pullRequestsResult = await reposService.GetPullRequests(action.Ids).ConfigureAwait(false);
+        var pullRequests = pullRequestsResult.Valid ? pullRequestsResult.Value : Array.Empty<PullRequest>();
+        dispatcher.Dispatch(new GetPullRequestsResultAction(pullRequests));
+
+        if (pullRequestsResult.Valid)
         {
-            snackbar.Add(message, Severity.Warning);
+            var notFoundIds = action.Ids.Except(pullRequests.Select(pr => pr.Id));
+            NotifyNotFoundIds(notFoundIds);
         }
-        dispatcher.Dispatch(resultAction);
+        else
+        {
+            snackbarService.SendError($"Could not get pull requests. Message: {pullRequestsResult.Message}");
+        }
+    }
+
+    private void NotifyNotFoundIds(IEnumerable<int> notFoundIds)
+    {
+        if (notFoundIds.Any())
+        {
+            var message = $"Could not find pull requests with IDs: {string.Join(", ", notFoundIds)}";
+            snackbarService.SendWarning(message);
+        }
     }
 }
