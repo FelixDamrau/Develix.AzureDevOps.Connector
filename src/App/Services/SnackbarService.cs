@@ -11,7 +11,16 @@ public class SnackbarService : ISnackbarService
         this.snackbar = snackbar;
     }
 
-    public void SendWarning(string message) => snackbar.Add(message, Severity.Warning);
+    public void SendWarning(string title, string message) => Add(title, message, Severity.Warning);
 
-    public void SendError(string message) => snackbar.Add(message, Severity.Error);
+    public void SendError(string title, string message) => Add(title, message, Severity.Error);
+
+    private void Add(string title, string message, Severity severity)
+    {
+        var snackbarMessage = $"""
+            <div style="font-weight: 800">{title}</div>
+            <div>{message}</div>
+            """;
+        snackbar.Add(snackbarMessage, severity);
+    }
 }

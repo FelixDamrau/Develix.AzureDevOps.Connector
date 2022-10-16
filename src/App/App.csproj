@@ -8,6 +8,7 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <AssemblyName>Develix.AzureDevOps.Connector.App</AssemblyName>
     <RootNamespace>Develix.AzureDevOps.Connector.App</RootNamespace>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

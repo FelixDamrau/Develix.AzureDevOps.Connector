@@ -2,6 +2,6 @@
 
 public interface ISnackbarService
 {
-    void SendError(string message);
-    void SendWarning(string message);
+    void SendError(string title, string message);
+    void SendWarning(string title, string message);
 }

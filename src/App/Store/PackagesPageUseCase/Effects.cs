@@ -24,7 +24,7 @@ public class Effects
         var resultAction = new GetPackagesResultAction(packages);
         dispatcher.Dispatch(resultAction);
         if (!packagesResult.Valid)
-            snackbarService.SendError($"Could not get packages! Message: {packagesResult.Message}");
+            snackbarService.SendError("Could not get packages!", packagesResult.Message);
     }
 
     [EffectMethod]
@@ -35,6 +35,6 @@ public class Effects
         var resultAction = new GetPackagesResultAction(packages);
         dispatcher.Dispatch(resultAction);
         if (!packageResult.Valid)
-            snackbarService.SendError($"Could not get package! Message: {packageResult.Message}");
+            snackbarService.SendError("Could not get package!", packageResult.Message);
     }
 }

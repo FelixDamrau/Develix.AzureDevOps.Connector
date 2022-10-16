@@ -30,7 +30,7 @@ public class Effects
         }
         else
         {
-            snackbarService.SendError($"Could not get pull requests. Message: {pullRequestsResult.Message}");
+            snackbarService.SendError("Could not get pull requests!", pullRequestsResult.Message);
         }
     }
 
@@ -38,8 +38,8 @@ public class Effects
     {
         if (notFoundIds.Any())
         {
-            var message = $"Could not find pull requests with IDs: {string.Join(", ", notFoundIds)}";
-            snackbarService.SendWarning(message);
+            var message = $"Missing IDs: {string.Join(", ", notFoundIds)}";
+            snackbarService.SendWarning("Could not find all pull requests", message);
         }
     }
 }

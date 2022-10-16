@@ -31,7 +31,7 @@ public class Effects
         }
         else
         {
-            snackbarService.SendError($"Could not get work items! Message: {workItemResult.Message}");
+            snackbarService.SendError("Could not get work items!", workItemResult.Message);
         }
     }
 
@@ -39,8 +39,8 @@ public class Effects
     {
         if (notFoundIds.Any())
         {
-            var message = $"Could not find work items with IDs: {string.Join(", ", notFoundIds)}";
-            snackbarService.SendWarning(message);
+            var message = $"Missing IDs: {string.Join(", ", notFoundIds)}";
+            snackbarService.SendWarning("Could not find all work items", message);
         }
     }
 }
