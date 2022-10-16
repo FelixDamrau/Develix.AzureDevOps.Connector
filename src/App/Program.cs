@@ -1,4 +1,5 @@
-﻿using Develix.AzureDevOps.Connector.Service;
+﻿using Develix.AzureDevOps.Connector.App.Services;
+using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 using MudBlazor.Services;
 
@@ -14,6 +15,7 @@ builder.Services.AddFluxor(options => options.ScanAssemblies(currentAssembly));
 builder.Services.AddScoped<IReposService, ReposService>();
 builder.Services.AddScoped<IWorkItemService, WorkItemService>();
 builder.Services.AddScoped<IPackagesService, PackagesService>();
+builder.Services.AddScoped<ISnackbarService, SnackbarService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
