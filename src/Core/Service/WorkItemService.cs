@@ -54,10 +54,13 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         {
             var prIds = prRelations.Select(prr => PullRequestFactory.GetPullRequestId(prr)).Where(r => r.Valid).Select(r => r.Value);
 
-            var gitPrs = reposService.GetPullRequests(prIds);
-            await foreach (var pr in gitPrs)
+            var pullRequestResults = await reposService.GetPullRequests(prIds).ConfigureAwait(false);
+            if (pullRequestResults.Valid)
             {
-                workItem.AddPullRequest(pr);
+                foreach (var pullRequest in pullRequestResults.Value)
+                {
+                    workItem.AddPullRequest(pullRequest);
+                }
             }
         }
     }
@@ -72,7 +75,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         return await client.GetWorkItemsAsync(
             ids: existingIds,
             asOf: result.AsOf,
-            expand: WorkItemExpand.Relations)
+            expand: WorkItemExpand.None)
             .ConfigureAwait(false);
     }
 

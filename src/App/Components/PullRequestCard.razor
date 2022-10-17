@@ -3,16 +3,22 @@
 
 <MudCard>
     <MudCardContent>
-        <MudText Typo="Typo.subtitle2">@PullRequest.Title</MudText>
+        <MudText Typo="Typo.subtitle1" Style="font-weight:800;">@PullRequest.Title</MudText>
         <MudGrid>
             <MudItem xs="12" sm=4>
-                <MudText Typo="Typo.body2">ID: @PullRequest.Id</MudText>
+                <MudText Typo="Typo.body2"><div style="font-weight:800; display:inline">ID:</div> @PullRequest.Id</MudText>
             </MudItem>
             <MudItem xs="12" sm=4>
-                <MudText Typo="Typo.body2">Status: @PullRequest.Status</MudText>
+                <MudText Typo="Typo.body2"><div style="font-weight:800; display:inline">Status:</div> @PullRequest.Status</MudText>
             </MudItem>
-            <MudItem xs="12" sm=4>
-                <MudText Typo="Typo.body2">Author: @PullRequest.Author</MudText>
+            <MudItem xs="12" sm=6>
+                <MudText Typo="Typo.body2"><div style="font-weight:800; display:inline">Author:</div> @PullRequest.Author</MudText>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudText Typo="Typo.body2">
+                    <MudLink Typo="Typo.body2" Href="@GetBranchUri(PullRequest.RespositorySource, PullRequest.SourceBranch)">@PullRequest.SourceBranch</MudLink> into
+                    <MudLink Typo="Typo.body2" Href="@GetBranchUri(PullRequest.RespositorySource, PullRequest.TargetBranch)">@PullRequest.TargetBranch</MudLink>
+                </MudText>
             </MudItem>
         </MudGrid>
     </MudCardContent>
@@ -23,4 +29,6 @@
     [EditorRequired]
     [NotNull]
     public PullRequest? PullRequest { get; set; }
+
+    private string GetBranchUri(Uri repositoryUri, string branchName) => $"{repositoryUri.AbsoluteUri}?Version=GB{branchName}";
 }

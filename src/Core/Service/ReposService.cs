@@ -1,4 +1,5 @@
 ﻿using Develix.AzureDevOps.Connector.Service.Logic;
+using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service;
@@ -6,14 +7,15 @@ namespace Develix.AzureDevOps.Connector.Service;
 public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposService
 {
     /// <inheritdoc/>
-    public async IAsyncEnumerable<Model.PullRequest> GetPullRequests(IEnumerable<int> ids)
+    public async Task<Result<IReadOnlyList<Model.PullRequest>>> GetPullRequests(IEnumerable<int> ids)
     {
-        IsInitializedGuard();
+        if (!IsInitialized())
+            return Result.Fail<IReadOnlyList<Model.PullRequest>>("Service is not initialized.");
 
-        foreach (var id in ids)
-        {
-            yield return await GetPullRequest(azureDevopsLogin.VssClient, id).ConfigureAwait(false);
-        }
+        var requests = ids.Select(id => GetPullRequest(azureDevopsLogin.VssClient, id));
+        var results = await Task.WhenAll(requests).ConfigureAwait(false);
+        IReadOnlyList<Model.PullRequest> pullRequests = results.Where(x => x.Valid).Select(x => x.Value).ToList();
+        return Result.Ok(pullRequests);
     }
 
     protected override async Task<GitClientLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
@@ -21,16 +23,16 @@ public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposSer
         return await GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
     }
 
-    private static async Task<Model.PullRequest> GetPullRequest(GitHttpClient prClient, int id)
+    private static async Task<Result<Model.PullRequest>> GetPullRequest(GitHttpClient prClient, int id)
     {
         try
         {
             var pr = await prClient.GetPullRequestByIdAsync(id).ConfigureAwait(false);
-            return PullRequestFactory.Create(pr);
+            return Result.Ok(PullRequestFactory.Create(pr));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return PullRequestFactory.GetDefaultInvalid() with { Id = id, Status = Model.PullRequestStatus.Invalid };
+            return Result.Fail<Model.PullRequest>($"Could not create pull request with id {id} - Message: {ex.Message}");
         }
     }
 }

@@ -6,9 +6,7 @@ namespace Develix.AzureDevOps.Connector.App.Store.PackagesPageUseCase;
 [FeatureState]
 public record PackagesPageState
 {
-    public string? ErrorMessage { get; init; }
-
     public bool IsLoading { get; init; } = false;
 
-    public IReadOnlyList<Package> Packages{ get; init; } = new List<Package>();
+    public IReadOnlyList<Package> Packages { get; init; } = new List<Package>();
 }

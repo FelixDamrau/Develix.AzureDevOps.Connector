@@ -7,8 +7,6 @@ namespace Develix.AzureDevOps.Connector.Service.Logic;
 
 internal static class PullRequestFactory
 {
-    public static Model.PullRequest GetDefaultInvalid() => new();
-
     public static bool IsPullRequestRelation(WorkItemRelation workItemRelation)
     {
         return string.Equals(workItemRelation.Rel, "ArtifactLink", StringComparison.OrdinalIgnoreCase)
@@ -31,13 +29,15 @@ internal static class PullRequestFactory
 
     public static Model.PullRequest Create(GitPullRequest pullRequest)
     {
-        return new Model.PullRequest
-        {
-            Author = pullRequest.CreatedBy.DisplayName,
-            Id = pullRequest.PullRequestId,
-            Title = pullRequest.Title,
-            Status = pullRequest.Status.ToModel(),
-        };
+        return new Model.PullRequest(
+            pullRequest.PullRequestId,
+            pullRequest.Status.ToModel(),
+            pullRequest.Repository.Name,
+            new(pullRequest.Repository.WebUrl, UriKind.Absolute),
+            pullRequest.Title,
+            pullRequest.CreatedBy.DisplayName,
+            pullRequest.SourceRefName[11..],
+            pullRequest.TargetRefName[11..]);
     }
 
     private static Model.PullRequestStatus ToModel(this PullRequestStatus status)
