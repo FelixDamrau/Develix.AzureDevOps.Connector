@@ -2,6 +2,8 @@
 using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi.Patch;
+using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
@@ -20,6 +22,47 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         if (!IsInitialized())
             return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
         return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests)).ConfigureAwait(false);
+    }
+
+    public async Task<Result> CreateWorkItem(string workItemType)
+    {
+        if (!IsInitialized())
+            return Result.Fail("Service is not initialized");
+
+        var wi = new JsonPatchDocument();
+        wi.Add(new()
+        {
+            Operation = Operation.Add,
+            Path = "/fields/System.Title",
+            Value = "Bug Title",
+        });
+        wi.Add(new()
+        {
+            Operation = Operation.Add,
+            Path = "/relations/-",
+            Value = new WorkItemRelation()
+            {
+                Rel = "System.LinkTypes.Hierarchy-Reverse",
+                Url = $"{azureDevopsLogin.AzureDevopsOrgUri}/_apis/wit/workItems/25",
+                Title = "A Link title",
+            }
+        });
+
+        var x = await azureDevopsLogin.VssClient.CreateWorkItemAsync(wi, "Testproject", workItemType, false, true, false, CancellationToken.None)
+            .ConfigureAwait(false);
+
+        return Result.Ok();
+    }
+
+    public async Task<IReadOnlyList<Model.WorkItemType>> GetWorkItemTypes(string project)
+    {
+        IsInitializedGuard();
+
+        var azdoWorkItemTypes = await azureDevopsLogin.VssClient
+            .GetWorkItemTypesAsync(project).ConfigureAwait(false);
+        return azdoWorkItemTypes
+            .Select(t => new Model.WorkItemType(t.Name, t.Description, t.Color, t.Icon.Url))
+            .ToList();
     }
 
     protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
