@@ -3,28 +3,40 @@
 @using System.Diagnostics.CodeAnalysis;
 @using System.ComponentModel.DataAnnotations;
 
-<MudPaper Elevation="2" Class="pa-3">
-    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
-        <DataAnnotationsValidator />
-        <MudCard>
-            <MudCardContent>
-                <MudTextField Label="Project name"
-                              @bind-Value="model.Project"
-                              DebounceInterval="500"
-                              OnDebounceIntervalElapsed="HandleProjectFieldDebounced"
-                              For="() => model.Project" />
-                <WorkItemTypeSelect WorkItemTypes="workItemTypes" @bind-Value="model.WorkItemType" For="() => model.WorkItemType" />
-                <MudTextField Label="Title" @bind-Value="model.Title" For="() => model.Title" />
-                <AreaPathSelect AreaPaths="areaPaths" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
-                <MudTextField Label="Assigned to" @bind-Value="model.AssignedTo" For="() => model.AssignedTo" />
-                <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit">Create</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </EditForm>
-</MudPaper>
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudCard Elevation="2" Class="pa-3">
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Project name"
+                                  @bind-Value="model.Project"
+                                  DebounceInterval="500"
+                                  OnDebounceIntervalElapsed="HandleProjectFieldDebounced"
+                                  For="() => model.Project" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Title" @bind-Value="model.Title" For="() => model.Title" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <WorkItemTypeSelect WorkItemTypes="workItemTypes" @bind-Value="model.WorkItemType" For="() => model.WorkItemType" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <AreaPathSelect AreaPaths="areaPaths" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Assigned to" @bind-Value="model.AssignedTo" For="() => model.AssignedTo" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
 
 @code {
     [Inject]
