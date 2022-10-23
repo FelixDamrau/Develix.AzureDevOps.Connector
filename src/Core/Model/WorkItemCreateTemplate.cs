@@ -11,8 +11,7 @@ public class WorkItemCreateTemplate
     public string Title { get; init; }
     public string WorkItemType { get; init; }
     public string Project { get; init; }
-    public string? AreaPath { get; init; }
+    public long? AreaId { get; init; }
     public string? AssignedTo { get; init; }
-    //public string? Description { get; init; }
     public int? ParentWorkItemId { get; init; }
 }

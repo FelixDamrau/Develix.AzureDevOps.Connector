@@ -15,12 +15,12 @@
                               For="() => model.Project" />
                 <WorkItemTypeSelect WorkItemTypes="workItemTypes" @bind-Value="model.WorkItemType" For="() => model.WorkItemType" />
                 <MudTextField Label="Title" @bind-Value="model.Title" For="() => model.Title" />
-                <MudTextField Label="Area path" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
+                <AreaPathSelect AreaPaths="areaPaths" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
                 <MudTextField Label="Assigned to" @bind-Value="model.AssignedTo" For="() => model.AssignedTo" />
                 <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
             </MudCardContent>
             <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit">Get</MudButton>
+                <MudButton ButtonType="ButtonType.Submit">Create</MudButton>
             </MudCardActions>
         </MudCard>
     </EditForm>
@@ -31,23 +31,37 @@
     [NotNull]
     private IWorkItemService? workItemService { get; set; }
 
-    private WorkItemType? selectedWorkItemType;
-
     private string project = string.Empty;
     private IReadOnlyList<WorkItemType> workItemTypes = Array.Empty<WorkItemType>();
+    private IReadOnlyList<AreaPath> areaPaths = Array.Empty<AreaPath>();
     private Model model = new();
 
     private async Task HandleProjectFieldDebounced(string value)
     {
-        var result = await workItemService.GetWorkItemTypes(value);
-        workItemTypes = result.Valid
-            ? result.Value
+        var workItemTypesResult = await workItemService.GetWorkItemTypes(value);
+        workItemTypes = workItemTypesResult.Valid
+            ? workItemTypesResult.Value
             : Array.Empty<WorkItemType>();
+
+        var areaPathsResult = await workItemService.GetAreaPaths(value, 3);
+        areaPaths = areaPathsResult.Valid
+            ? areaPathsResult.Value
+            : Array.Empty<AreaPath>();
     }
 
     private void OnValidSubmit(EditContext context)
     {
         StateHasChanged();
+        var template = new WorkItemCreateTemplate(model.Title, model.WorkItemType.Name, model.Project)
+            {
+                AreaId = model.AreaPath?.Id,
+                AssignedTo = model.AssignedTo,
+                ParentWorkItemId = model.ParentWorkItemId,
+                Project = model.Project,
+                Title = model.Title,
+                WorkItemType = model.WorkItemType.Name,
+            };
+        workItemService.CreateWorkItem(template);
     }
 
 
@@ -58,15 +72,13 @@
         public string Title { get; set; } = string.Empty;
 
         [Required]
-        public WorkItemType? WorkItemType { get; set; }
+        public WorkItemType WorkItemType { get; set; } = WorkItemType.Invalid;
 
         [Required]
         [StringLength(int.MaxValue, MinimumLength = 1)]
         public string Project { get; set; } = string.Empty;
 
-        [Required]
-        [StringLength(int.MaxValue, MinimumLength = 1)]
-        public string? AreaPath { get; set; }
+        public AreaPath? AreaPath { get; set; }
 
         public string? AssignedTo { get; set; }
 

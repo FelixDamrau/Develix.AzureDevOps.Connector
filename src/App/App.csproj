@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Store\CreateWorkItemPageUseCase\" />
     <Folder Include="Store\WorkItemTemplateBuilderPageUseCase\" />
   </ItemGroup>
 

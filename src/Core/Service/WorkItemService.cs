@@ -38,11 +38,11 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
 
     }
 
-    public async Task<Result<IReadOnlyList<string>>> GetAreaPaths(string project, int depth)
+    public async Task<Result<IReadOnlyList<Model.AreaPath>>> GetAreaPaths(string project, int depth)
     {
         return IsInitialized()
             ? await Wrap(() => GetWorkAreaPathsInternal(project, depth)).ConfigureAwait(false)
-            : Result.Fail<IReadOnlyList<string>>("Service is not initialized");
+            : Result.Fail<IReadOnlyList<Model.AreaPath>>("Service is not initialized");
     }
 
     protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
@@ -91,12 +91,21 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
             .ToList();
     }
 
-    private async Task<IReadOnlyList<string>> GetWorkAreaPathsInternal(string project, int depth)
+    private async Task<IReadOnlyList<Model.AreaPath>> GetWorkAreaPathsInternal(string project, int depth)
     {
+        IsInitializedGuard();
+
         var areaPaths = await azureDevopsLogin.VssClient
             .GetClassificationNodeAsync(project, TreeStructureGroup.Areas, depth: depth)
             .ConfigureAwait(false);
-        return areaPaths.Children.Select(x => x.Path).ToList();
+
+        Func<WorkItemClassificationNode, IEnumerable<WorkItemClassificationNode>>? flatten = null;
+        flatten = n => new[] { n }
+        .Concat(n.Children is null
+            ? Enumerable.Empty<WorkItemClassificationNode>()
+            : n.Children.SelectMany(c => flatten!(c)));
+
+        return flatten(areaPaths).Select(p => new Model.AreaPath { Id = p.Id, Name = p.Path }).ToList();
     }
 
     private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)
@@ -135,7 +144,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         return await client.GetWorkItemsAsync(
             ids: existingIds,
             asOf: result.AsOf,
-            expand: WorkItemExpand.None)
+            expand: WorkItemExpand.All)
             .ConfigureAwait(false);
     }
 

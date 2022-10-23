@@ -12,6 +12,8 @@ public class WorkItem
 
     public WorkItemType WorkItemType { get; init; } = WorkItemType.Invalid;
 
+    public AreaPath AreaPath { get; init; } = AreaPath.Invalid;
+
     private readonly List<PullRequest> pullRequests = new();
 
     public IReadOnlyList<PullRequest> PullRequests => pullRequests;

@@ -22,10 +22,12 @@ public class WorkItemFactory
         var workItemType = await GetWorkItemType(workItem).ConfigureAwait(false);
         var status = await GetStatus(workItem, teamProject, workItemType.Name).ConfigureAwait(false);
         var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
+        var areaPath = GetAreaPath(workItem);
         return new WorkItem
         {
             Id = workItem.Id ?? -1,
             AzureDevopsLink = azureDevopsLink,
+            AreaPath = areaPath,
             Status = status,
             TeamProject = teamProject,
             Title = title,
@@ -66,5 +68,16 @@ public class WorkItemFactory
         return WorkItemType.Invalid;
     }
 
-    private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id) => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
+    private static string GetAzureDevopsLink(Uri azureDevopsOrgUri, string teamProject, int? id)
+        => $"{azureDevopsOrgUri}{teamProject}/_workitems/edit/{id}";
+
+    private static AreaPath GetAreaPath(TfWorkItem workItem)
+    {
+        if (workItem.Fields["System.AreaPath"] is string areaPath
+            && workItem.Fields["System.AreaId"] is long areaID)
+        {
+            return new() { Id = areaID, Name = areaPath };
+        }
+        return AreaPath.Invalid;
+    }
 }

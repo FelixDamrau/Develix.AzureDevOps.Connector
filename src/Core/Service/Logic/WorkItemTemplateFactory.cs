@@ -38,7 +38,7 @@ internal static class WorkItemTemplateFactory
         WorkItemCreateTemplate template,
         [NotNullWhen(true)] out JsonPatchOperation? areaPath)
     {
-        if (template.AreaPath is null)
+        if (template.AreaId is null)
         {
             areaPath = null;
             return false;
@@ -46,8 +46,8 @@ internal static class WorkItemTemplateFactory
         areaPath = new()
         {
             Operation = Operation.Add,
-            Path = "/fields/System.AreaPath",
-            Value = template.AreaPath,
+            Path = "/fields/System.AreaId",
+            Value = template.AreaId,
         };
         return true;
     }
@@ -56,7 +56,7 @@ internal static class WorkItemTemplateFactory
         WorkItemCreateTemplate template,
         [NotNullWhen(true)] out JsonPatchOperation? assignedTo)
     {
-        if (template.AreaPath is null)
+        if (template.AssignedTo is null)
         {
             assignedTo = null;
             return false;
