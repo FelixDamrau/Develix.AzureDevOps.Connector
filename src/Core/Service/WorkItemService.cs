@@ -2,8 +2,6 @@
 using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
-using Microsoft.VisualStudio.Services.WebApi.Patch;
-using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
@@ -19,50 +17,32 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
     /// <inheritdoc/>
     public async Task<Result<IReadOnlyList<Model.WorkItem>>> GetWorkItems(IEnumerable<int> ids, bool includePullRequests)
     {
-        if (!IsInitialized())
-            return Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
-        return await Wrap(() => GetWorkItemsInternal(ids, includePullRequests)).ConfigureAwait(false);
+        return IsInitialized()
+            ? await Wrap(() => GetWorkItemsInternal(ids, includePullRequests)).ConfigureAwait(false)
+            : Result.Fail<IReadOnlyList<Model.WorkItem>>("Service is not initialized");
     }
 
-    public async Task<Result> CreateWorkItem(string workItemType)
+    /// <inheritdoc/>
+    public async Task<Result<Model.WorkItem>> CreateWorkItem(Model.WorkItemCreateTemplate template)
     {
-        if (!IsInitialized())
-            return Result.Fail("Service is not initialized");
-
-        var wi = new JsonPatchDocument();
-        wi.Add(new()
-        {
-            Operation = Operation.Add,
-            Path = "/fields/System.Title",
-            Value = "Bug Title",
-        });
-        wi.Add(new()
-        {
-            Operation = Operation.Add,
-            Path = "/relations/-",
-            Value = new WorkItemRelation()
-            {
-                Rel = "System.LinkTypes.Hierarchy-Reverse",
-                Url = $"{azureDevopsLogin.AzureDevopsOrgUri}/_apis/wit/workItems/25",
-                Title = "A Link title",
-            }
-        });
-
-        var x = await azureDevopsLogin.VssClient.CreateWorkItemAsync(wi, "Testproject", workItemType, false, true, false, CancellationToken.None)
-            .ConfigureAwait(false);
-
-        return Result.Ok();
+        return IsInitialized()
+            ? await Wrap(() => CreateWorkItemInternal(template)).ConfigureAwait(false)
+            : Result.Fail<Model.WorkItem>("Service is not initialized");
     }
 
-    public async Task<IReadOnlyList<Model.WorkItemType>> GetWorkItemTypes(string project)
+    public async Task<Result<IReadOnlyList<Model.WorkItemType>>> GetWorkItemTypes(string project)
     {
-        IsInitializedGuard();
+        return IsInitialized()
+            ? await Wrap(() => GetWorkItemTypesInternal(project)).ConfigureAwait(false)
+            : Result.Fail<IReadOnlyList<Model.WorkItemType>>("Service is not initialized");
 
-        var azdoWorkItemTypes = await azureDevopsLogin.VssClient
-            .GetWorkItemTypesAsync(project).ConfigureAwait(false);
-        return azdoWorkItemTypes
-            .Select(t => new Model.WorkItemType(t.Name, t.Description, t.Color, t.Icon.Url))
-            .ToList();
+    }
+
+    public async Task<Result<IReadOnlyList<string>>> GetAreaPaths(string project, int depth)
+    {
+        return IsInitialized()
+            ? await Wrap(() => GetWorkAreaPathsInternal(project, depth)).ConfigureAwait(false)
+            : Result.Fail<IReadOnlyList<string>>("Service is not initialized");
     }
 
     protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
@@ -78,8 +58,45 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
             return Array.Empty<Model.WorkItem>();
 
         var queryResult = await RunQueryAsync(azureDevopsLogin.VssClient, ids).ConfigureAwait(false);
-        var workItems = queryResult.Select(tfWi => Create(tfWi, azureDevopsLogin.AzureDevopsOrgUri, includePullRequests, azureDevopsLogin.WorkItemFactory));
+        var workItems = queryResult
+            .Select(tfWi => Create(tfWi, azureDevopsLogin.AzureDevopsOrgUri, includePullRequests, azureDevopsLogin.WorkItemFactory));
         return await Task.WhenAll(workItems).ConfigureAwait(false);
+    }
+
+    private async Task<Model.WorkItem> CreateWorkItemInternal(Model.WorkItemCreateTemplate template)
+    {
+        IsInitializedGuard();
+
+        var azdoWorkItem = await azureDevopsLogin.VssClient.CreateWorkItemAsync(
+            WorkItemTemplateFactory.Create(template, azureDevopsLogin.AzureDevopsOrgUri.AbsoluteUri),
+            template.Project,
+            template.WorkItemType,
+            validateOnly: false,
+            bypassRules: true,
+            userState: false,
+            CancellationToken.None)
+            .ConfigureAwait(false);
+        return await Create(azdoWorkItem, azureDevopsLogin.AzureDevopsOrgUri, false, azureDevopsLogin.WorkItemFactory)
+            .ConfigureAwait(false);
+    }
+
+    private async Task<IReadOnlyList<Model.WorkItemType>> GetWorkItemTypesInternal(string project)
+    {
+        IsInitializedGuard();
+
+        var azdoWorkItemTypes = await azureDevopsLogin.VssClient
+            .GetWorkItemTypesAsync(project).ConfigureAwait(false);
+        return azdoWorkItemTypes
+            .Select(t => new Model.WorkItemType(t.Name, t.Description, t.Color, t.Icon.Url))
+            .ToList();
+    }
+
+    private async Task<IReadOnlyList<string>> GetWorkAreaPathsInternal(string project, int depth)
+    {
+        var areaPaths = await azureDevopsLogin.VssClient
+            .GetClassificationNodeAsync(project, TreeStructureGroup.Areas, depth: depth)
+            .ConfigureAwait(false);
+        return areaPaths.Children.Select(x => x.Path).ToList();
     }
 
     private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)

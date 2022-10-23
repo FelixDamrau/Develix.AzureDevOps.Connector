@@ -1,4 +1,5 @@
-﻿using Develix.AzureDevOps.Connector.Service;
+﻿using Develix.AzureDevOps.Connector.App.Services;
+using Develix.AzureDevOps.Connector.Service;
 using Fluxor;
 
 namespace Develix.AzureDevOps.Connector.App.Store.CreateWorkItemPageUseCase;
@@ -6,26 +7,41 @@ namespace Develix.AzureDevOps.Connector.App.Store.CreateWorkItemPageUseCase;
 public class Effects
 {
     private readonly IWorkItemService workItemService;
+    private readonly ISnackbarService snackbarService;
 
-
-    public Effects(IWorkItemService workItemService)
+    public Effects(IWorkItemService workItemService, ISnackbarService snackbarService)
     {
         this.workItemService = workItemService;
+        this.snackbarService = snackbarService;
     }
 
     [EffectMethod]
     public async Task HandleCreateWorkItemAction(CreateWorkItemAction action, IDispatcher dispatcher)
     {
-        await workItemService.CreateWorkItem(action.WorkItemType).ConfigureAwait(false);
-
-        var resultAction = new CreateWorkItemResultAction();
-        dispatcher.Dispatch(resultAction);
+        var workItemResult = await workItemService.CreateWorkItem(action.WorkItemTemplate).ConfigureAwait(false);
+        if (workItemResult.Valid)
+        {
+            var resultAction = new CreateWorkItemResultAction(workItemResult.Value);
+            dispatcher.Dispatch(resultAction);
+        }
+        else
+        {
+            snackbarService.SendError("Could not create work item!", workItemResult.Message);
+        }
     }
 
     [EffectMethod]
     public async Task HandleGetWorkItemTypesAction(GetWorkItemTypesAction action, IDispatcher dispatcher)
     {
-        var workItemTypes = await workItemService.GetWorkItemTypes(action.Project).ConfigureAwait(false);
-        dispatcher.Dispatch(new GetWorkItemTypesResultAction(workItemTypes));
+        var workItemTypesResult = await workItemService.GetWorkItemTypes(action.Project).ConfigureAwait(false);
+        if (workItemTypesResult.Valid)
+        {
+            dispatcher.Dispatch(new GetWorkItemTypesResultAction(workItemTypesResult.Value));
+
+        }
+        else
+        {
+            snackbarService.SendError("Could not get work item types!", workItemTypesResult.Message);
+        }
     }
 }

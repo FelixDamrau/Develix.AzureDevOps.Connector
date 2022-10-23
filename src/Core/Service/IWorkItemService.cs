@@ -7,7 +7,9 @@ public interface IWorkItemService : IAzureDevOpsService
 {
     Task<Result<IReadOnlyList<WorkItem>>> GetWorkItems(IEnumerable<int> ids, bool includePullRequests);
 
-    Task<Result> CreateWorkItem(string workItemType);
+    Task<Result<Model.WorkItem>> CreateWorkItem(Model.WorkItemCreateTemplate template);
 
-    Task<IReadOnlyList<Model.WorkItemType>> GetWorkItemTypes(string project);
+    Task<Result<IReadOnlyList<Model.WorkItemType>>> GetWorkItemTypes(string project);
+
+    Task<Result<IReadOnlyList<string>>> GetAreaPaths(string project, int depth);
 }

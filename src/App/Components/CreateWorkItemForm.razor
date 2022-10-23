@@ -1,0 +1,75 @@
+﻿@using Develix.AzureDevOps.Connector.Model;
+@using Develix.AzureDevOps.Connector.Service;
+@using System.Diagnostics.CodeAnalysis;
+@using System.ComponentModel.DataAnnotations;
+
+<MudPaper Elevation="2" Class="pa-3">
+    <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudCard>
+            <MudCardContent>
+                <MudTextField Label="Project name"
+                              @bind-Value="model.Project"
+                              DebounceInterval="500"
+                              OnDebounceIntervalElapsed="HandleProjectFieldDebounced"
+                              For="() => model.Project" />
+                <WorkItemTypeSelect WorkItemTypes="workItemTypes" @bind-Value="model.WorkItemType" For="() => model.WorkItemType" />
+                <MudTextField Label="Title" @bind-Value="model.Title" For="() => model.Title" />
+                <MudTextField Label="Area path" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
+                <MudTextField Label="Assigned to" @bind-Value="model.AssignedTo" For="() => model.AssignedTo" />
+                <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit">Get</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </EditForm>
+</MudPaper>
+
+@code {
+    [Inject]
+    [NotNull]
+    private IWorkItemService? workItemService { get; set; }
+
+    private WorkItemType? selectedWorkItemType;
+
+    private string project = string.Empty;
+    private IReadOnlyList<WorkItemType> workItemTypes = Array.Empty<WorkItemType>();
+    private Model model = new();
+
+    private async Task HandleProjectFieldDebounced(string value)
+    {
+        var result = await workItemService.GetWorkItemTypes(value);
+        workItemTypes = result.Valid
+            ? result.Value
+            : Array.Empty<WorkItemType>();
+    }
+
+    private void OnValidSubmit(EditContext context)
+    {
+        StateHasChanged();
+    }
+
+
+    private class Model
+    {
+        [Required]
+        [StringLength(int.MaxValue, MinimumLength = 1)]
+        public string Title { get; set; } = string.Empty;
+
+        [Required]
+        public WorkItemType? WorkItemType { get; set; }
+
+        [Required]
+        [StringLength(int.MaxValue, MinimumLength = 1)]
+        public string Project { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(int.MaxValue, MinimumLength = 1)]
+        public string? AreaPath { get; set; }
+
+        public string? AssignedTo { get; set; }
+
+        public int? ParentWorkItemId { get; set; }
+    }
+}

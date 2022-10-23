@@ -11,15 +11,12 @@
 <MudPaper Elevation="2" Class="pa-4 ma-3">
     <MudText Typo="Typo.h4">Work Items</MudText>
 
-    <MudSelect T="WorkItemType" Dense="true" @bind-Value="workItemType">
-        @foreach(var wit in state.Value.WorkItemTypes)
-        {
-            <MudSelectItem Value="@wit"><MudImage Style="height: 1em" Src="@(wit.Icon?.AbsoluteUri)" /> @wit.Name</MudSelectItem>
-        }
-    </MudSelect>
+    <WorkItemTypeSelect WorkItemTypes="state.Value.WorkItemTypes" @bind-Value="workItemType" />
 
     <MudButton OnClick="GetWorkItemTypes">Get WI Types</MudButton>
     <MudButton OnClick="CreateWorkItem">Create work item</MudButton>
+
+    <CreateWorkItemForm />
 </MudPaper>
 
 @code {
@@ -37,7 +34,7 @@
     {
         if (workItemType is null)
             return;
-        var action = new CreateWorkItemAction(workItemType.Name);
+        var action = new CreateWorkItemAction(null); //TODO
         dispatcher.Dispatch(action);
     }
 

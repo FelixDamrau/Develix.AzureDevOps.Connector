@@ -2,7 +2,7 @@
 
 namespace Develix.AzureDevOps.Connector.App.Store;
 
-public record CreateWorkItemAction(string WorkItemType);
-public record CreateWorkItemResultAction();
+public record CreateWorkItemAction(WorkItemCreateTemplate WorkItemTemplate);
+public record CreateWorkItemResultAction(WorkItem WorkItem);
 public record GetWorkItemTypesAction(string Project);
 public record GetWorkItemTypesResultAction(IReadOnlyList<WorkItemType> WorkItemTypes);
