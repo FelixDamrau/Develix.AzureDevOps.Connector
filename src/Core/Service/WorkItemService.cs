@@ -45,6 +45,13 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
             : Result.Fail<IReadOnlyList<Model.AreaPath>>("Service is not initialized");
     }
 
+    public async Task<Result<string>> CreateIteration(string project, string name, DateTime startDate, DateTime finishDate)
+    {
+        return IsInitialized()
+            ? await Wrap(() => CreateIterationInternal(project, name, startDate, finishDate)).ConfigureAwait(false)
+            : Result.Fail<string>("Service is not initialized");
+    }
+
     protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
         return await WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
@@ -76,7 +83,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
             userState: false,
             CancellationToken.None)
             .ConfigureAwait(false);
-        return await Create(azdoWorkItem, azureDevopsLogin.AzureDevopsOrgUri, false, azureDevopsLogin.WorkItemFactory)
+        return await Create(azdoWorkItem, azureDevopsLogin.AzureDevopsOrgUri, true, azureDevopsLogin.WorkItemFactory)
             .ConfigureAwait(false);
     }
 
@@ -98,14 +105,31 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         var areaPaths = await azureDevopsLogin.VssClient
             .GetClassificationNodeAsync(project, TreeStructureGroup.Areas, depth: depth)
             .ConfigureAwait(false);
-
         Func<WorkItemClassificationNode, IEnumerable<WorkItemClassificationNode>>? flatten = null;
         flatten = n => new[] { n }
-        .Concat(n.Children is null
-            ? Enumerable.Empty<WorkItemClassificationNode>()
-            : n.Children.SelectMany(c => flatten!(c)));
+            .Concat(n.Children is null
+                ? Enumerable.Empty<WorkItemClassificationNode>()
+                : n.Children.SelectMany(c => flatten!(c)));
 
         return flatten(areaPaths).Select(p => new Model.AreaPath { Id = p.Id, Name = p.Path }).ToList();
+    }
+
+    private async Task<string> CreateIterationInternal(string project, string name, DateTime startDate, DateTime endDate)
+    {
+        IsInitializedGuard();
+
+        var node = new WorkItemClassificationNode()
+        {
+            Name = name,
+            Attributes = new Dictionary<string, object>
+            {
+                { "startDate", startDate },
+                { "finishDate", endDate },
+            }
+        };
+        var x = await azureDevopsLogin.VssClient.CreateOrUpdateClassificationNodeAsync(node, project, TreeStructureGroup.Iterations)
+            .ConfigureAwait(false);
+        return x.Name;
     }
 
     private async Task<Model.WorkItem> Create(WorkItem azureDevopsWorkItem, Uri baseOrgUri, bool includePullRequests, WorkItemFactory workItemFactory)

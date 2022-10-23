@@ -12,4 +12,6 @@ public interface IWorkItemService : IAzureDevOpsService
     Task<Result<IReadOnlyList<Model.WorkItemType>>> GetWorkItemTypes(string project);
 
     Task<Result<IReadOnlyList<AreaPath>>> GetAreaPaths(string project, int depth);
+
+    Task<Result<string>> CreateIteration(string project, string name, DateTime startDate, DateTime finishDate);
 }
