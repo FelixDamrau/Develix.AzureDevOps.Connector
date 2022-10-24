@@ -2,6 +2,7 @@
 @using Develix.AzureDevOps.Connector.Service;
 @using System.Diagnostics.CodeAnalysis;
 @using System.ComponentModel.DataAnnotations;
+@using Develix.Essentials.Core;
 
 <EditForm Model="@model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
@@ -30,6 +31,24 @@
                 <MudItem xs="12" sm="6" xl="3">
                     <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
                 </MudItem>
+                @if (createdWorkItem is not null)
+                {
+                    @if (createdWorkItem.Valid)
+                    {
+                        <MudGrid>
+                            <MudItem xs="12" sm="3">
+                                <MudText Typo="Typo.subtitle2">Created work item:</MudText>
+                                <WorkItemCard WorkItem="createdWorkItem.Value" />
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        <MudItem xs="12" sm="3">
+                            <MudAlert>No work item could be created! @createdWorkItem.Message</MudAlert>
+                        </MudItem>
+                    }
+                }
             </MudGrid>
         </MudCardContent>
         <MudCardActions>
@@ -47,6 +66,7 @@
     private IReadOnlyList<WorkItemType> workItemTypes = Array.Empty<WorkItemType>();
     private IReadOnlyList<AreaPath> areaPaths = Array.Empty<AreaPath>();
     private Model model = new();
+    private Result<WorkItem>? createdWorkItem;
 
     private async Task HandleProjectFieldDebounced(string value)
     {
@@ -61,7 +81,7 @@
             : Array.Empty<AreaPath>();
     }
 
-    private void OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext context)
     {
         StateHasChanged();
         var template = new WorkItemCreateTemplate(model.Title, model.WorkItemType.Name, model.Project)
@@ -73,9 +93,28 @@
                 Title = model.Title,
                 WorkItemType = model.WorkItemType.Name,
             };
-        workItemService.CreateWorkItem(template);
+        var createdId = await workItemService.CreateWorkItem(template);
+        if (createdId.Valid)
+        {
+            var result = await workItemService.GetWorkItems(new[] { createdId.Value }, false);
+            if (result.Valid)
+            {
+                var wi = result.Value.FirstOrDefault();
+                if (wi is not null)
+                    createdWorkItem = Result.Ok(wi);
+                else
+                    createdWorkItem = Result.Fail<WorkItem>($"Could not find created work item");
+            }
+            else
+            {
+                createdWorkItem = Result.Fail<WorkItem>(result.Message);
+            }
+        }
+        else
+        {
+            createdWorkItem = Result.Fail<WorkItem>(createdId.Message);
+        }
     }
-
 
     private class Model
     {

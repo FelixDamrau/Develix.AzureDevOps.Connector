@@ -6,7 +6,6 @@ using Microsoft.VisualStudio.Services.WebApi;
 namespace Develix.AzureDevOps.Connector.Service.Requests;
 
 internal abstract class RequestBase<T, TLogin, TVssClient>
-    where T : class
     where TVssClient : class, IDisposable
     where TLogin : AzureDevopsLogin<TVssClient>
 {

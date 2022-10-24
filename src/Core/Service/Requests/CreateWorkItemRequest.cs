@@ -3,7 +3,7 @@ using Develix.AzureDevOps.Connector.Service.Logic;
 
 namespace Develix.AzureDevOps.Connector.Service.Requests;
 
-internal class CreateWorkItemRequest : WorkItemTrackingRequestBase<WorkItem>
+internal class CreateWorkItemRequest : WorkItemTrackingRequestBase<int>
 {
     private readonly WorkItemCreateTemplate template;
 
@@ -13,7 +13,7 @@ internal class CreateWorkItemRequest : WorkItemTrackingRequestBase<WorkItem>
         this.template = template;
     }
 
-    protected override async Task<WorkItem> Execute(WorkItemTrackingLogin login, CancellationToken cancellationToken = default)
+    protected override async Task<int> Execute(WorkItemTrackingLogin login, CancellationToken cancellationToken = default)
     {
         var azdoWorkItem = await login.VssClient
             .CreateWorkItemAsync(
@@ -26,6 +26,6 @@ internal class CreateWorkItemRequest : WorkItemTrackingRequestBase<WorkItem>
                 CancellationToken.None)
             .ConfigureAwait(false);
 
-        return await login.WorkItemFactory.Create(azdoWorkItem, login.AzureDevopsOrgUri).ConfigureAwait(false);
+        return azdoWorkItem.Id ?? -1;
     }
 }

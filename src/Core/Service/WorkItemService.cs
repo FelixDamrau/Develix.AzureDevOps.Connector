@@ -20,7 +20,7 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         return await request.Execute().ConfigureAwait(false);
     }
 
-    public async Task<Result<Model.WorkItem>> CreateWorkItem(Model.WorkItemCreateTemplate template)
+    public async Task<Result<int>> CreateWorkItem(Model.WorkItemCreateTemplate template)
     {
         var request = new CreateWorkItemRequest(azureDevopsLogin, template);
         return await request.Execute().ConfigureAwait(false);
