@@ -88,7 +88,6 @@ internal static class WorkItemTemplateFactory
             {
                 Rel = "System.LinkTypes.Hierarchy-Reverse",
                 Url = $"{azureDevopsOrgUri}/_apis/wit/workItems/{template.ParentWorkItemId}",
-                Title = "A Link title",
             }
         };
         return true;

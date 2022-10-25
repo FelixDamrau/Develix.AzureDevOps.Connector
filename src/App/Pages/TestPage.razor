@@ -4,9 +4,10 @@
 @using System.Diagnostics.CodeAnalysis;
 
 <h3>TestPage</h3>
+
 <MudDateRangePicker Label="Pick Date Range" @bind-DateRange="dateRange" />
 <MudTextField Label="Iteration Name" @bind-Value="name" />
-<MudButton OnClick="Foo">Click</MudButton>
+<MudButton OnClick="Click">Click</MudButton>
 @code {
     [Inject]
     [NotNull]
@@ -15,8 +16,8 @@
     private string name = string.Empty;
     private DateRange dateRange = new(DateTime.Now, DateTime.Now.AddDays(5));
 
-    private async Task Foo()
+    private async Task Click()
     {
-        var x = await workItemService.CreateIteration("TestProject", name, dateRange.Start ?? default, dateRange.End ?? default);
+        _ = await workItemService.CreateIteration("TestProject", name, dateRange.Start ?? default, dateRange.End ?? default);
     }
 }
