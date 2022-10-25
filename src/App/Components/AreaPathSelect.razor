@@ -1,0 +1,11 @@
+﻿@using Develix.AzureDevOps.Connector.Model;
+@using System.Linq.Expressions;
+
+<MudAutocomplete T="AreaPath"
+                 For="@For"
+                 Dense="true"
+                 Disabled="GetDisabled()"
+                 Label="@GetLabel()"
+                 ValueChanged="SelectedAreaPathChanged"
+                 ToStringFunc="@(p => p?.GetDisplayName() ?? string.Empty)"
+                 SearchFunc="Search" />

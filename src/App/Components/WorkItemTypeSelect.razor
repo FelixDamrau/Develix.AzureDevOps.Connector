@@ -1,0 +1,14 @@
+﻿@using Develix.AzureDevOps.Connector.Model;
+@using System.Linq.Expressions;
+
+<MudSelect T="WorkItemType"
+           For="@For"
+           Dense="true"
+           Disabled="GetDisabled()"
+           Label="@GetLabel()"
+           SelectedValuesChanged="SelectedWorkItemsChanged">
+    @foreach (var wit in WorkItemTypes ?? Array.Empty<WorkItemType>())
+    {
+        <MudSelectItem Value="@wit"><MudImage Style="height: 1em" Src="@(wit.Icon?.AbsoluteUri)" /> @wit.Name</MudSelectItem>
+    }
+</MudSelect>

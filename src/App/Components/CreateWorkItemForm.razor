@@ -1,0 +1,58 @@
+﻿@using Develix.AzureDevOps.Connector.Model;
+@using Develix.AzureDevOps.Connector.Service;
+@using System.Diagnostics.CodeAnalysis;
+@using System.ComponentModel.DataAnnotations;
+@using Develix.Essentials.Core;
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudCard Elevation="2" Class="pa-3">
+        <MudCardContent>
+            <MudGrid>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Project name"
+                                  @bind-Value="model.Project"
+                                  DebounceInterval="500"
+                                  OnDebounceIntervalElapsed="HandleProjectFieldDebounced"
+                                  For="() => model.Project" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Title" @bind-Value="model.Title" For="() => model.Title" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <WorkItemTypeSelect WorkItemTypes="workItemTypes" @bind-Value="model.WorkItemType" For="() => model.WorkItemType" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <AreaPathSelect AreaPaths="areaPaths" @bind-Value="model.AreaPath" For="() => model.AreaPath" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudTextField Label="Assigned to" @bind-Value="model.AssignedTo" For="() => model.AssignedTo" />
+                </MudItem>
+                <MudItem xs="12" sm="6" xl="3">
+                    <MudNumericField Label="Parent WI ID" @bind-Value="model.ParentWorkItemId" />
+                </MudItem>
+                @if (createdWorkItem is not null)
+                {
+                    @if (createdWorkItem.Valid)
+                    {
+                        <MudGrid>
+                            <MudItem xs="12" sm="3">
+                                <MudText Typo="Typo.subtitle2">Created work item:</MudText>
+                                <WorkItemCard WorkItem="createdWorkItem.Value" />
+                            </MudItem>
+                        </MudGrid>
+                    }
+                    else
+                    {
+                        <MudItem xs="12" sm="3">
+                            <MudAlert>No work item could be created! @createdWorkItem.Message</MudAlert>
+                        </MudItem>
+                    }
+                }
+            </MudGrid>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit">Create</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>

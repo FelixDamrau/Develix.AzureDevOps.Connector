@@ -36,15 +36,6 @@ public abstract class VssService<TVssClient, TLogin> : IAzureDevOpsService, IDis
 
     protected abstract Task<TLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken);
 
-    protected async Task<Result> Wrap(Action action)
-    {
-        var function = () => { action(); return Task.FromResult(true); };
-        var result = await Wrap(() => function()).ConfigureAwait(false);
-        return result.Valid
-            ? Result.Ok()
-            : Result.Fail(result.Message);
-    }
-
     protected async Task<Result<T>> Wrap<T>(Func<Task<T>> function)
     {
         try
