@@ -35,9 +35,9 @@ public class PackagesService : VssService<PackageServiceHttpClient, PackageServi
         return Result.Ok(ToPackage(result.Value));
     }
 
-    protected override async Task<PackageServiceLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
+    protected override PackageServiceLogin CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await PackageServiceLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
+        return PackageServiceLogin.Create(baseUri, azureDevopsWorkItemReadToken);
     }
 
     private static Package ToPackage(Value p)
@@ -54,5 +54,10 @@ public class PackagesService : VssService<PackageServiceHttpClient, PackageServi
                 })
                 .ToArray(),
         };
+    }
+
+    protected override async Task CheckConnection(PackageServiceHttpClient vssClient)
+    {
+        await vssClient.ConnectionCheck().ConfigureAwait(false);
     }
 }

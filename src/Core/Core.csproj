@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>Preview</LangVersion>
@@ -12,7 +12,7 @@
   <PropertyGroup>
     <Version>$(PackageVersion)</Version>
     <PackageId>Develix.AzureDevOps.Connector</PackageId>
-    <PackageVersion>1.4.0</PackageVersion>
+    <PackageVersion>1.5.0</PackageVersion>
     <Title>Develix AzureDevOps Connector</Title>
     <PackageDescription>Develix Azure DevOps Connector</PackageDescription>
     <Authors>Felix Damrau</Authors>

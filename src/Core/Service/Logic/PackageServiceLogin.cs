@@ -7,15 +7,11 @@ public class PackageServiceLogin : AzureDevopsLogin<PackageServiceHttpClient>
     {
     }
 
-    public static async Task<PackageServiceLogin> Create(Uri azureDevopsOrgUri, string token)
+    public static PackageServiceLogin Create(Uri azureDevopsOrgUri, string token)
     {
         var vssClient = new PackageServiceHttpClient(azureDevopsOrgUri.AbsoluteUri, token);
-        await ConnectionCheck(vssClient).ConfigureAwait(false);
         return new PackageServiceLogin(azureDevopsOrgUri, vssClient);
     }
 
-    private static async Task ConnectionCheck(PackageServiceHttpClient client)
-    {
-        await client.ConnectionCheck().ConfigureAwait(false);
-    }
+
 }

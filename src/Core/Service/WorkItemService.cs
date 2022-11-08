@@ -2,6 +2,7 @@
 using Develix.AzureDevOps.Connector.Service.Requests;
 using Develix.Essentials.Core;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 
 namespace Develix.AzureDevOps.Connector.Service;
 
@@ -45,8 +46,14 @@ public class WorkItemService : VssService<WorkItemTrackingHttpClient, WorkItemTr
         return await request.Execute().ConfigureAwait(false);
     }
 
-    protected override async Task<WorkItemTrackingLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
+    protected override WorkItemTrackingLogin CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
+        return WorkItemTrackingLogin.Create(baseUri, azureDevopsWorkItemReadToken);
+    }
+
+    protected override async Task CheckConnection(WorkItemTrackingHttpClient vssClient)
+    {
+        var wiql = new Wiql() { Query = "Select [Id] From WorkItems Where [Id] = 367" };
+        await vssClient.QueryByWiqlAsync(wiql).ConfigureAwait(false);
     }
 }

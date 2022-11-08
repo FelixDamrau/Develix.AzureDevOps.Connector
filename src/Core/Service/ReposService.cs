@@ -18,9 +18,9 @@ public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposSer
         return Result.Ok(pullRequests);
     }
 
-    protected override async Task<GitClientLogin> CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
+    protected override GitClientLogin CreateLogin(Uri baseUri, string azureDevopsWorkItemReadToken)
     {
-        return await GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken).ConfigureAwait(false);
+        return GitClientLogin.Create(baseUri, azureDevopsWorkItemReadToken);
     }
 
     private static async Task<Result<Model.PullRequest>> GetPullRequest(GitHttpClient prClient, int id)
@@ -34,5 +34,10 @@ public class ReposService : VssService<GitHttpClient, GitClientLogin>, IReposSer
         {
             return Result.Fail<Model.PullRequest>($"Could not create pull request with id {id} - Message: {ex.Message}");
         }
+    }
+
+    protected override async Task CheckConnection(GitHttpClient vssClient)
+    {
+        await vssClient.GetRepositoriesAsync().ConfigureAwait(false);
     }
 }
