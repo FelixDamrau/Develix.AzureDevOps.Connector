@@ -3,20 +3,13 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service.Logic;
 
-internal abstract class Cache<T, TKey>
+internal abstract class Cache<T, TKey>(WorkItemTrackingHttpClient workItemTrackingHttpClient, T fallback)
     where T : class
     where TKey : IEquatable<TKey>
 {
-    protected readonly WorkItemTrackingHttpClient workItemTrackingHttpClient;
-    private readonly T fallback;
-    private readonly Dictionary<TKey, ItemCache> cache;
-
-    protected Cache(WorkItemTrackingHttpClient workItemTrackingHttpClient, T fallback)
-    {
-        this.workItemTrackingHttpClient = workItemTrackingHttpClient;
-        this.fallback = fallback;
-        cache = new();
-    }
+    protected readonly WorkItemTrackingHttpClient workItemTrackingHttpClient = workItemTrackingHttpClient;
+    private readonly T fallback = fallback;
+    private readonly Dictionary<TKey, ItemCache> cache = [];
 
     public async Task<T> Get(TKey cacheReference, string key)
     {
