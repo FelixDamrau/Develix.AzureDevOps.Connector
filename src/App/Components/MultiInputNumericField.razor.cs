@@ -16,7 +16,7 @@ public partial class MultiInputNumericField
     public string Label { get; set; } = "Number";
 
     [Parameter]
-    public HashSet<int> Values { get; set; } = new();
+    public HashSet<int> Values { get; set; } = [];
 
     /// <summary>
     /// Assign any action to this <see cref="EventCallback"/>, this will cause the parent control to fire <see cref="ComponentBase.StateHasChanged"/> when the action is triggered.
@@ -27,23 +27,19 @@ public partial class MultiInputNumericField
     [MemberNotNullWhen(false, nameof(intValue))]
     private bool Disabled() => intValue is null || Values.Contains(intValue.Value);
 
-    private void Add()
+    private async Task AddAsync()
     {
         if (Disabled())
             return;
-        Add(intValue.Value);
-        numericField?.Reset();
+        Values.Add(intValue.Value);
+        await OnValuesChange.InvokeAsync().ConfigureAwait(true);
+        if(numericField is not null)
+            await numericField.ResetAsync().ConfigureAwait(true);
     }
 
-    private void Add(int value)
-    {
-        Values.Add(value);
-        OnValuesChange.InvokeAsync();
-    }
-
-    private void Closed(MudChip chip)
+    private async Task CloseAsync(MudChip chip)
     {
         Values.Remove((int)chip.Value);
-        OnValuesChange.InvokeAsync();
+        await OnValuesChange.InvokeAsync().ConfigureAwait(true);
     }
 }

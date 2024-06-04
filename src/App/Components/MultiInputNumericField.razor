@@ -9,10 +9,10 @@
                              Immediate="true" />
         </MudItem>
         <MudItem xs="1" Style=" align-self:center; justify-content:center">
-            <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" Disabled="Disabled()" OnClick="Add" Size="Size.Medium">Add</MudIconButton>
+            <MudIconButton Variant="Variant.Outlined" Color="Color.Primary" Icon="@Icons.Material.Filled.Add" Disabled="Disabled()" OnClick="AddAsync" Size="Size.Medium">Add</MudIconButton>
         </MudItem>
         <MudItem xs="12" md="7" xl="8">
-            <MudChipSet AllClosable="true" OnClose="Closed">
+            <MudChipSet AllClosable="true" OnClose="CloseAsync">
                 @foreach (var value in Values)
                 {
                     <MudChip Value="@value" Text="@(ChipPrefix + value)" Size="Size.Small" />
