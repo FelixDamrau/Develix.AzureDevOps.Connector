@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 
 namespace Develix.AzureDevOps.Connector.Service.Logic;
@@ -9,7 +10,7 @@ internal abstract class Cache<T, TKey>(WorkItemTrackingHttpClient workItemTracki
 {
     protected readonly WorkItemTrackingHttpClient workItemTrackingHttpClient = workItemTrackingHttpClient;
     private readonly T fallback = fallback;
-    private readonly Dictionary<TKey, ItemCache> cache = [];
+    private readonly ConcurrentDictionary<TKey, ItemCache> cache = [];
 
     public async Task<T> Get(TKey cacheReference, string key)
     {
