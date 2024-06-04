@@ -4,24 +4,18 @@ using AzdoWorkItem = Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models.Wor
 
 namespace Develix.AzureDevOps.Connector.Service.Logic;
 
-public class WorkItemFactory
+public class WorkItemFactory(WorkItemTrackingHttpClient workItemTrackingHttpClient)
 {
-    private readonly WorkItemTypeCache workItemTypeCache;
-    private readonly WorkItemStatusCache workItemStatusCache;
+    private readonly WorkItemTypeCache workItemTypeCache = new(workItemTrackingHttpClient);
+    private readonly WorkItemStatusCache workItemStatusCache = new(workItemTrackingHttpClient);
 
-    public WorkItemFactory(WorkItemTrackingHttpClient workItemTrackingHttpClient)
-    {
-        workItemTypeCache = new WorkItemTypeCache(workItemTrackingHttpClient);
-        workItemStatusCache = new WorkItemStatusCache(workItemTrackingHttpClient);
-    }
-
-    public async Task<WorkItem> Create(AzdoWorkItem workItem, Uri azureDevopsOrgUri)
+    public async Task<WorkItem> Create(AzdoWorkItem workItem, Uri azureDevOpsOrgUri)
     {
         var teamProject = GetTeamProject(workItem);
         var title = GetTitle(workItem);
         var workItemType = await GetWorkItemType(workItem).ConfigureAwait(false);
         var status = await GetStatus(workItem, teamProject, workItemType.Name).ConfigureAwait(false);
-        var azureDevopsLink = GetAzureDevopsLink(azureDevopsOrgUri, teamProject, workItem.Id);
+        var azureDevopsLink = GetAzureDevopsLink(azureDevOpsOrgUri, teamProject, workItem.Id);
         var areaPath = GetAreaPath(workItem);
         return new WorkItem
         {
