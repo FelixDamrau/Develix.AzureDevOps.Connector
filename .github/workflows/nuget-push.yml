@@ -1,31 +1,46 @@
-﻿name: NuGet push
+﻿name: Publish NuGet Package
+
 on:
   push:
     branches: [ main ]
 
 jobs:
-  publish-nuget:
+  build:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout 🛎
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+      
     - name: Setup .NET 🐱‍💻
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '6.0.x'
-        include-prerelease: true
+        dotnet-version: '8.x'
+        
     - name: Restore dependencies
       run: dotnet restore
+    
     - name: Build 🔧
       run: dotnet build -c Release --no-restore
+    
     - name: Test 🧪
       run: dotnet test -c Release --no-build --verbosity normal
-    - name: Publish to NuGet 🚀
-      uses: FelixDamrau/publish-nuget@v2.5.6
-      with:
-        PACKAGE_NAME: 'Develix.AzureDevOps.Connector'
-        PROJECT_FILE_PATH: 'src/Core/Core.csproj'
-        VERSION_REGEX: '^\s*<PackageVersion>(.*)<\/PackageVersion>\s*$'
-        TAG_FORMAT: '*'
-        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
-        INCLUDE_SYMBOLS: 'true'
+
+    - name: Pack 🗜️
+      run: dotnet pack -c Release -o ./artifacts /p:ContinuousIntegrationBuild=true
+
+    - name: Extract package version
+      id: extract-version
+      run: |
+        PACKAGE_VERSION=$(grep -oP '(?<=<PackageVersion>).*?(?=<\/PackageVersion>)' src/Core/Core.csproj)
+        echo "Found package version: $PACKAGE_VERSION"
+        echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+
+    - name: Publish NuGet package
+      run: dotnet nuget push ./artifacts/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+
+    - name: Tag repository with package version
+      if: success()
+      run: |
+        git tag ${{ env.PACKAGE_VERSION }}
+        git push origin ${{ env.PACKAGE_VERSION }}
